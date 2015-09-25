@@ -1,0 +1,3 @@
+TextureManager (load, get, delete)
+http://gamedev.stackexchange.com/questions/59205/storing-texture-ids-for-fast-global-retrieval
+
