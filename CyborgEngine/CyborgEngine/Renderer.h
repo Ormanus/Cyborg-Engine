@@ -1,13 +1,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include <cstdio>
-#include <cstdlib>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/transform.hpp>
+#include "TextureManager.h"
 
 
 

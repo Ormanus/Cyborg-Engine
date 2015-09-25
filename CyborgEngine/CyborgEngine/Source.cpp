@@ -1,6 +1,7 @@
 #define GLEW_STATIC
 #define GLM_FORCE_RADIANS
 
+
 #include "Renderer.h"
 GLFWwindow* window;
 
@@ -49,6 +50,6 @@ int main()
 
 	Renderer::uninitRender();
 	glfwTerminate();
-	//Insert engine here.
+	
 	return 0;
 }
