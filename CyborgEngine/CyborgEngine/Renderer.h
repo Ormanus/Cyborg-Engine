@@ -23,8 +23,10 @@ public:
 	void static initDraw();
 	void static FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 
-	Renderer();
-	~Renderer();
+	void static drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3);
+
+	Renderer(){}
+	~Renderer(){}
 };
 
 
