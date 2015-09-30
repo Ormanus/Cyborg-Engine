@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "common\shader.hpp"
 
 namespace {
 	GLuint programID;
@@ -10,6 +11,7 @@ namespace {
 	GLuint MVP_MatrixID;
 	GLuint TextureID;
 	GLuint uvbuffer;
+	GLuint colorbuffer;
 	GLuint Texture;
 	glm::mat4 VP;
 	glm::vec4 DefaultColor;
@@ -38,6 +40,8 @@ void Renderer::initDraw()
 
 	glm::mat4 V = glm::ortho(-1.0f, 1.0f, -1.0f*height / width, 1.0f*height / width);
 	VP = V*P;
+
+	glUseProgram(programID);
 	// ---------------------------
 }
 
@@ -50,17 +54,36 @@ void Renderer::render()
 void Renderer::initRender(GLFWwindow* w)
 {
 	window = w;
-	glClearColor(0.0f, 0.0f, 0.5f, 0.0f); // Taustaväri - musta
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Taustaväri - musta
 
-	//aseta piirtoväri valkoiseksi
+	//asetetaan piirtoväri oranssiksi
 	DefaultColor.r = 1.0f;
-	DefaultColor.g = 1.0f;
-	DefaultColor.b = 1.0f;
+	DefaultColor.g = 0.4f;
+	DefaultColor.b = 0.0f;
 	DefaultColor.a = 1.0f;
 
+	glGenVertexArrays(1, &VertexArrayID);
+	glBindVertexArray(VertexArrayID);
+
 	//Ladataan shaderit
-		//shader
+	//valmiissa ohjelmassa bool setShaders() -funktio ajonaikaiseen shaderien vaihtoon?
+	programID = LoadShaders("shaders/VertexShader.vertexshader", "shaders/FragmentShader.fragmentshader");
 	//----------------
+
+	//luodaan väribufferi. 
+	//TODO: siirrä muualle myöhemmin?
+
+	static const GLfloat g_color_buffer_data[] = {
+		DefaultColor.r, DefaultColor.g, DefaultColor.b,
+		DefaultColor.r, DefaultColor.g, DefaultColor.b,
+		DefaultColor.r, DefaultColor.g, DefaultColor.b,
+	};
+
+	glGenBuffers(1, &colorbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(g_color_buffer_data),
+		g_color_buffer_data, GL_STATIC_DRAW);
 
 	//glEnable(jotain)
 	//glEnable(GL_BLEND);
@@ -70,28 +93,37 @@ void Renderer::initRender(GLFWwindow* w)
 void Renderer::uninitRender()
 {
 	// ???
+	glDeleteBuffers(1, &vertexbuffer);
+	glDeleteBuffers(1, &indexbuffer);
 }
 
 void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
 {
-	glLoadIdentity();
-	glBegin(GL_TRIANGLES);
+	//piirrä kolmio:
+	//Toimii toistaiseksi. Optimointi edelleen kesken.
+	//Tällä hetkellä todennäköisesti hidas, mutta ei kuitenkaan vuoda liikaa muistia...
 
-	glColor3f(DefaultColor.r, DefaultColor.g, DefaultColor.b);
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	static const GLfloat g_vertex_buffer_data[] = {
+		x1, y1, 1.0f,
+		x2, y2, 1.0f,
+		x3, y3, 1.0f,
+	};
 
-	glVertex3f(x1, y1, 0.0f);
-	glVertex3f(x2, y2, 0.0f);
-	glVertex3f(x3, y3, 0.0f);
-
-	glEnd();
-
-	glfwSwapBuffers(window);
-
-	/*  ### Nämä otetaan käytöön vasta shaderien kanssa? ###
+	glGenBuffers(1, &vertexbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	
+	static const GLubyte g_indices[] =
+	{
+		0, 1, 2,
+	};
+	glGenBuffers(1, &indexbuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(g_indices), g_indices, GL_STATIC_DRAW);
 
 	MVP_MatrixID = glGetUniformLocation(programID, "MVP");
 	glUniformMatrix4fv(MVP_MatrixID, 1, GL_FALSE, &MVP[0][0]);
+
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glVertexAttribPointer(
@@ -102,11 +134,12 @@ void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, fl
 		0,                  // stride
 		(void*)0            // array buffer offset
 		);
+
 	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glVertexAttribPointer(
-		1,                  // 
-		2,                  // size
+		1,                  // attribute 1
+		3,                  // size
 		GL_FLOAT,           // type
 		GL_FALSE,           // normalized?
 		0,                  // stride
@@ -116,5 +149,7 @@ void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, fl
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_BYTE, (GLvoid*)0);
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
-	*/
+
+	glDeleteBuffers(1, &vertexbuffer);
+	glDeleteBuffers(1, &indexbuffer);
 }
