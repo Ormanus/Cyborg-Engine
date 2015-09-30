@@ -44,6 +44,7 @@ int main()
 		//render stuff
 		Renderer::initDraw();
 		Renderer::drawTriangle(0.5f, 0.5f, -0.5f, -0.5f, 0.0f, 1.0f);
+		Renderer::drawTriangle(0.5f, -0.5f, -0.5f, 0.5f, 0.0f, 1.0f);
 		Renderer::render();
 		glfwPollEvents();
 	} while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&

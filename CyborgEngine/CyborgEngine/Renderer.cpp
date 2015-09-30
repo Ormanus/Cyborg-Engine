@@ -15,6 +15,7 @@ namespace {
 	GLuint Texture;
 	glm::mat4 VP;
 	glm::vec4 DefaultColor;
+	int N_shapes;
 };
 
 void Renderer::FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
@@ -81,9 +82,10 @@ void Renderer::initRender(GLFWwindow* w)
 
 	glGenBuffers(1, &colorbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(g_color_buffer_data),
-		g_color_buffer_data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+
+	//MVP näkyy shadereille
+	MVP_MatrixID = glGetUniformLocation(programID, "MVP");
 
 	//glEnable(jotain)
 	//glEnable(GL_BLEND);
@@ -95,6 +97,7 @@ void Renderer::uninitRender()
 	// ???
 	glDeleteBuffers(1, &vertexbuffer);
 	glDeleteBuffers(1, &indexbuffer);
+	glDeleteBuffers(1, &colorbuffer);
 }
 
 void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
@@ -103,29 +106,30 @@ void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, fl
 	//Toimii toistaiseksi. Optimointi edelleen kesken.
 	//Tällä hetkellä todennäköisesti hidas, mutta ei kuitenkaan vuoda liikaa muistia...
 
+	GLuint vb, ib;
+
 	static const GLfloat g_vertex_buffer_data[] = {
 		x1, y1, 1.0f,
 		x2, y2, 1.0f,
 		x3, y3, 1.0f,
 	};
 
-	glGenBuffers(1, &vertexbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	glGenBuffers(1, &vb);
+	glBindBuffer(GL_ARRAY_BUFFER, vb);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 	
 	static const GLubyte g_indices[] =
 	{
 		0, 1, 2,
 	};
-	glGenBuffers(1, &indexbuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbuffer);
+	glGenBuffers(1, &ib);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(g_indices), g_indices, GL_STATIC_DRAW);
 
-	MVP_MatrixID = glGetUniformLocation(programID, "MVP");
 	glUniformMatrix4fv(MVP_MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
 	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
 	glVertexAttribPointer(
 		0,                  // attribute 
 		3,                  // size
@@ -150,6 +154,9 @@ void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, fl
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 
-	glDeleteBuffers(1, &vertexbuffer);
-	glDeleteBuffers(1, &indexbuffer);
+	//muistivuoto?
+	glDeleteBuffers(1, &vb);
+	glDeleteBuffers(1, &ib);
+
+	N_shapes++;
 }
