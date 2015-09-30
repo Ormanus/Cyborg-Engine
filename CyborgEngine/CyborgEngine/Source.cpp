@@ -40,11 +40,14 @@ int main()
 
 	Renderer::initRender(window);
 
+	float a = 0;
+
 	do{
+		a += 0.01;
 		//render stuff
 		Renderer::initDraw();
-		Renderer::drawTriangle(0.5f, 0.5f, -0.5f, -0.5f, 0.0f, 1.0f);
-		Renderer::drawTriangle(0.5f, -0.5f, -0.5f, 0.5f, 0.0f, 1.0f);
+		Renderer::drawTriangle(sin(a), cos(a), -sin(a), -cos(a), sin(a), -cos(a));
+		Renderer::drawTriangle(-sin(a), -cos(a), sin(a), cos(a), -sin(a), cos(a));
 		Renderer::render();
 		glfwPollEvents();
 	} while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&

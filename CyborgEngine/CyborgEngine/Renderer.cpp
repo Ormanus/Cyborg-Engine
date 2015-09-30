@@ -108,7 +108,7 @@ void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, fl
 
 	GLuint vb, ib;
 
-	static const GLfloat g_vertex_buffer_data[] = {
+	/*static const */GLfloat g_vertex_buffer_data[] = {
 		x1, y1, 1.0f,
 		x2, y2, 1.0f,
 		x3, y3, 1.0f,
@@ -116,15 +116,15 @@ void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, fl
 
 	glGenBuffers(1, &vb);
 	glBindBuffer(GL_ARRAY_BUFFER, vb);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
 	
-	static const GLubyte g_indices[] =
+	/*static const */GLubyte g_indices[] =
 	{
 		0, 1, 2,
 	};
 	glGenBuffers(1, &ib);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(g_indices), g_indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(g_indices), g_indices, GL_DYNAMIC_DRAW);
 
 	glUniformMatrix4fv(MVP_MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
