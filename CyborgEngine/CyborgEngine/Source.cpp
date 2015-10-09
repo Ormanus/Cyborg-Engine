@@ -46,8 +46,13 @@ int main()
 		a += 0.01;
 		//render stuff
 		Renderer::initDraw();
-		Renderer::drawTriangle(sin(a), cos(a), -sin(a), -cos(a), sin(a), -cos(a));
-		Renderer::drawTriangle(-sin(a), -cos(a), sin(a), cos(a), -sin(a), cos(a));
+		Renderer::setColor(1, 0.5, 0, 1);
+		Renderer::drawTriangle(sin(a), cos(a), -sin(a*7), -cos(a*7), sin(a), -cos(a*20));
+		Renderer::drawTriangle(-sin(a), -cos(a), sin(a*7), cos(a*7), -sin(a), cos(a*20));
+		Renderer::setColor(0, abs(cos(a * 10)), abs(cos(a * 13)), 1);
+		Renderer::drawRectangle(-0.75, -0.75, 0.75, 0.75);
+		Renderer::setColor(1, 1, 0, 1);
+		Renderer::drawPie(-0.5, 0, 0.5, 1-(abs(cos(a*16))/ 8));
 		Renderer::render();
 		glfwPollEvents();
 	} while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&

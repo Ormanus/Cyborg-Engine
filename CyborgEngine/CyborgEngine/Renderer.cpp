@@ -100,6 +100,30 @@ void Renderer::uninitRender()
 	glDeleteBuffers(1, &colorbuffer);
 }
 
+void Renderer::drawRectangle(float x1, float y1, float x2, float y2)
+{
+	drawTriangle(x1, y1, x1, y2, x2, y2);
+	drawTriangle(x1, y1, x2, y1, x2, y2);
+}
+
+void Renderer::drawCircle(float x, float y, float r)
+{
+	float angle = 2.0*3.14159265 / 64;
+	for (int i = 0; i < 64; i++)
+	{
+		drawTriangle(x, y, x + cos(angle * i)*r, y + sin(angle * i)*r, x + cos(angle * (i + 1))*r, y + sin(angle * (i + 1))*r);
+	}
+}
+
+void Renderer::drawPie(float x, float y, float r,float a)
+{
+	float angle = 2.0*3.14159265 / 64 * a;
+	for (int i = 0; i < 64; i++)
+	{
+		drawTriangle(x, y, x + cos(angle * i)*r, y + sin(angle * i)*r, x + cos(angle * (i + 1))*r, y + sin(angle * (i + 1))*r);
+	}
+}
+
 void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
 {
 	//piirrä kolmio:
@@ -159,4 +183,20 @@ void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, fl
 	glDeleteBuffers(1, &ib);
 
 	N_shapes++;
+}
+
+void Renderer::setColor(float r, float g, float b, float a)
+{
+	DefaultColor.r = r;
+	DefaultColor.g = g;
+	DefaultColor.b = b;
+	DefaultColor.a = a;
+
+	GLfloat g_color_buffer_data[] = {
+		DefaultColor.r, DefaultColor.g, DefaultColor.b,
+		DefaultColor.r, DefaultColor.g, DefaultColor.b,
+		DefaultColor.r, DefaultColor.g, DefaultColor.b,
+	};
+	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
 }
