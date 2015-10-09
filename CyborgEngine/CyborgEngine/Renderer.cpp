@@ -124,6 +124,18 @@ void Renderer::drawPie(float x, float y, float r,float a)
 	}
 }
 
+void Renderer::drawPolygon(Polygon* p, const float x, const float y)
+{
+	std::vector<glm::vec2>* pp = p->getPoints();
+	glm::vec2 c = pp->at(0);
+	unsigned const N_points = pp->size();
+	for (unsigned i = 1; i < N_points-1; i++) //aloita 1:stä, koska center
+	{
+		drawTriangle(x + c.x, y + c.y, x + pp->at(i).x, y + pp->at(i).y, x + pp->at(i + 1).x, y + pp->at(i + 1).y);
+	}
+	drawTriangle(x + c.x, y + c.y, x + pp->at(N_points - 1).x, y + pp->at(N_points - 1).y, x + pp->at(1).x, y + pp->at(1).y);
+}
+
 void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
 {
 	//piirrä kolmio:

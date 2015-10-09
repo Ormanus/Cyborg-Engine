@@ -71,11 +71,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="common\shader.cpp" />
+    <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\shader.hpp" />
+    <ClInclude Include="Polygon.h" />
     <ClInclude Include="Renderer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
