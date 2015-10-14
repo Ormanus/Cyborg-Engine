@@ -123,6 +123,13 @@ void Renderer::drawPie(float x, float y, float r,float a)
 		drawTriangle(x, y, x + cos(angle * i)*r, y + sin(angle * i)*r, x + cos(angle * (i + 1))*r, y + sin(angle * (i + 1))*r);
 	}
 }
+void Renderer::drawMultiColorTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
+{
+	//Tämä valmiiksi sitten kun saadaan väreille ne nimet
+	setColor(1.0,1.0,1.0,1.0);
+	drawTriangle(x1,y1,x2,y2,x3,y3);
+	
+}
 
 void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
 {
@@ -184,7 +191,64 @@ void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, fl
 
 	N_shapes++;
 }
+void Renderer::drawLine(float startPointX, float startPointY, float endPointX, float endPointY,float width)
+{
+	//Piirrä viiva:
+	//Onko tämä järkevä?????
 
+	GLuint bv, bi;
+
+GLfloat g_vertex_buffer_data[] = {
+		startPointX, startPointY, 1.0f,
+		endPointX, endPointY, 1.0f,
+	};
+
+	glLineWidth(width);
+
+	glGenBuffers(1, &bv);
+	glBindBuffer(GL_ARRAY_BUFFER, bv);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
+
+	GLubyte g_indices[] =
+	{
+		0, 1,
+	};
+	glGenBuffers(1, &bi);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bi);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(g_indices), g_indices, GL_DYNAMIC_DRAW);
+
+	glUniformMatrix4fv(MVP_MatrixID, 1, GL_FALSE, &MVP[0][0]);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bi);
+	glVertexAttribPointer(
+		0,                  // attribute 
+		3,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+		);
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+	glVertexAttribPointer(
+		1,                  // attribute 1
+		3,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+		);
+
+	glDrawElements(GL_LINE_LOOP, 3, GL_UNSIGNED_BYTE, (GLvoid*)0);
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+
+	
+	glDeleteBuffers(1, &bv);
+	glDeleteBuffers(1, &bi);
+}
 void Renderer::setColor(float r, float g, float b, float a)
 {
 	DefaultColor.r = r;
