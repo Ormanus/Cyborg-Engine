@@ -11,6 +11,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 #include "Polygon.h"
+#include "TextureManager.h"
 
 class Renderer
 {
@@ -23,6 +24,7 @@ public:
 	void static FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 	void static drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3);
+	void static drawTexturedTriangle(float x1, float y1, float x2, float y2, float x3, float y3, std::string texture);
 	void static drawRectangle(float x1, float y1, float x2, float y2);
 	void static drawCircle(float x, float y, float r);
 	void static drawPie(float x, float y, float r, float percentage);

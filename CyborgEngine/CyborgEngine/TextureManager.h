@@ -16,19 +16,19 @@
 class TextureManager
 {
 public:
-	GLuint getTexture(std::string name);
+	GLuint getTexture(const std::string name);
 	TextureManager();
 	~TextureManager();
 private:
 
-	std::vector<unsigned char> png;
-	unsigned char* image;
-	int width, height;
+	 std::vector<unsigned char> png;
+	 unsigned char* image;
+	 int width, height;
 
-	GLuint texture;
-	std::unordered_map<std::string, GLuint> textures;
-	void loadTexture(std::string name, std::string filePath);
-	void deleteTexture(std::string name);
+	 GLuint texture;
+	 std::unordered_map<std::string, GLuint> textures;
+	 void loadTexture(std::string name, std::string filePath);
+	 void deleteTexture(std::string name);
 
 	
 };

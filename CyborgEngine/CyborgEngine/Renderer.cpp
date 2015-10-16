@@ -3,6 +3,7 @@
 
 namespace {
 	GLuint programID;
+	GLuint textureProgramID;
 	GLuint vertexbuffer;
 	GLuint VertexArrayID;
 	GLuint indexbuffer;
@@ -16,6 +17,7 @@ namespace {
 	glm::mat4 VP;
 	glm::vec4 DefaultColor;
 	int N_shapes;
+	TextureManager* TM;
 };
 
 void Renderer::FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
@@ -66,9 +68,12 @@ void Renderer::initRender(GLFWwindow* w)
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
+	TM = new TextureManager;
+
 	//Ladataan shaderit
 	//valmiissa ohjelmassa bool setShaders() -funktio ajonaikaiseen shaderien vaihtoon?
 	programID = LoadShaders("shaders/VertexShader.vertexshader", "shaders/FragmentShader.fragmentshader");
+	textureProgramID = LoadShaders("shaders/TextureVertexShader.txt", "shaders/TextureFragmentShader.txt");
 	//----------------
 
 	//luodaan väribufferi. 
@@ -154,6 +159,66 @@ void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, fl
 	glBindBuffer(GL_ARRAY_BUFFER, vb);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
 	
+	/*static const */GLubyte g_indices[] =
+	{
+		0, 1, 2,
+	};
+	glGenBuffers(1, &ib);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(g_indices), g_indices, GL_DYNAMIC_DRAW);
+
+	glUniformMatrix4fv(MVP_MatrixID, 1, GL_FALSE, &MVP[0][0]);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
+	glVertexAttribPointer(
+		0,                  // attribute 
+		3,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+		);
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+	glVertexAttribPointer(
+		1,                  // attribute 1
+		3,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+		);
+
+	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_BYTE, (GLvoid*)0);
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+
+	//muistivuoto?
+	glDeleteBuffers(1, &vb);
+	glDeleteBuffers(1, &ib);
+
+	N_shapes++;
+}
+
+void Renderer::drawTexturedTriangle(float x1, float y1, float x2, float y2, float x3, float y3, std::string file)
+{
+	//very experimental:
+	GLuint texture = TM->getTexture(file);
+
+	GLuint vb, ib;
+
+	/*static const */GLfloat g_vertex_buffer_data[] = {
+		x1, y1, 1.0f,
+		x2, y2, 1.0f,
+		x3, y3, 1.0f,
+	};
+
+	glGenBuffers(1, &vb);
+	glBindBuffer(GL_ARRAY_BUFFER, vb);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
+
 	/*static const */GLubyte g_indices[] =
 	{
 		0, 1, 2,
