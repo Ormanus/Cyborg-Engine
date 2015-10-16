@@ -53,6 +53,9 @@ int main()
 		Renderer::drawRectangle(-0.75, -0.75, 0.75, 0.75);
 		Renderer::setColor(1, 1, 0, 1);
 		Renderer::drawPie(-0.5, 0, 0.5, 1-(abs(cos(a*16))/ 8));
+		Renderer::drawMultiColorTriangle(-0.25,-0.25,0.25,-0.25,0.25,0.25);
+		Renderer::setColor(1.0,0.0,0.0,1.0);
+		Renderer::drawLine(sin(a),cos(a),-sin(a),-cos(a),5.0);
 		Renderer::render();
 		glfwPollEvents();
 	} while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
