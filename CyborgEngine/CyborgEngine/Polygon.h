@@ -19,7 +19,7 @@ public:
 	void setOrigin(glm::vec2 newOrigin){ origin = newOrigin; }
 	void setOrigin(float x, float y){ origin.x = x; origin.y = y; }
 	void setRotation(float angle){ rotation = angle; }
-	void setPoints(glm::vec2* p, int number);
+	void setPoints(glm::vec2* p, int size);
 private:
 	std::vector<glm::vec2> points;
 	std::vector<glm::vec2> rotatedPoints;

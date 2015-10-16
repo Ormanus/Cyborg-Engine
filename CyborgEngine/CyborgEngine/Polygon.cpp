@@ -11,21 +11,24 @@ Polygon::~Polygon()
 {
 }
 
-void Polygon::setPoints(glm::vec2* p, int number)
+void Polygon::setPoints(glm::vec2* p, int size)
 {
 	float maxX = 0, maxY = 0, minX = 0, minY = 0;
 	points.clear();
 	points.push_back(glm::vec2(0, 0)); //center
-	for (int i = 0; i < number; i++)
+	for (int i = 0; i < size; i++)
 	{
 		points.push_back(p[i]);
 		if (p[i].x > maxX){ maxX = p[i].x; }
 		if (p[i].y > maxY){ maxY = p[i].y; }
 		if (p[i].x < minX){ minX = p[i].x; }
 		if (p[i].y < minY){ minY = p[i].y; }
+		points[0].x += p[i].x;
+		points[0].y += p[i].y;
 	}
-	points[0].x = (maxX + minX) / 2;
-	points[0].y = (maxY + minY) / 2;
+
+	points[0].x /= size;
+	points[0].y /= size;
 }
 
 std::vector<glm::vec2>* Polygon::getPoints()

@@ -129,7 +129,7 @@ void Renderer::drawPolygon(Polygon* p, const float x, const float y)
 	std::vector<glm::vec2>* pp = p->getPoints();
 	glm::vec2 c = pp->at(0);
 	unsigned const N_points = pp->size();
-	for (unsigned i = 1; i < N_points-1; i++) //aloita 1:stä, koska center
+	for (unsigned i = 1; i < N_points-1; i++) //aloita 1:stä, koska ensimmäinen vec2 on kuvion keskipiste
 	{
 		drawTriangle(x + c.x, y + c.y, x + pp->at(i).x, y + pp->at(i).y, x + pp->at(i + 1).x, y + pp->at(i + 1).y);
 	}

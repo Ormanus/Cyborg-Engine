@@ -46,15 +46,17 @@ int main()
 	Polygon p;
 	glm::vec2 points[]
 	{
-		glm::vec2(-0.1, 0.1),
-		glm::vec2(0.2, 0.2),
-		glm::vec2(0.2, 0.1),
-		glm::vec2(0.3, 0.0),
-		glm::vec2(0.2, -0.1),
-		glm::vec2(0.2, -0.2),
-		glm::vec2(-0.1, -0.1),
+		
+		glm::vec2(0.0, 0.21),
+		glm::vec2(0.05, 0.05),
+		glm::vec2(0.4, 0.0),
+		glm::vec2(0.05, -0.05),
+		glm::vec2(0.0, -0.21),
+		glm::vec2(-0.05, -0.05),
+		glm::vec2(-0.4, 0.0),
+		glm::vec2(-0.05, 0.05),
 	};
-	p.setPoints(points, 7);
+	p.setPoints(points, 8);
 	p.setOrigin(-0.5, 0.0);
 
 	do{
