@@ -14,21 +14,33 @@ TextureManager::~TextureManager()
 
 void TextureManager::loadTexture(std::string name, std::string filePath)
 {
-
+	//ladataan kuva tiedostosta (PNG, BMP, JPG, TGA, DDS, PSD, HDR)
 	const char* c = filePath.c_str();
-	//Ladataan tekstuuri. Suora linkki sijaintiin esim. "images/image.bmp"
-	texture = loadBMP_custom(c);
+	image = SOIL_load_image(c, &width, &height, 0, SOIL_LOAD_RGBA);
+	//luodaan tekstuuri
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+	//Vapautetaan muistista käytön jälkeen
+	SOIL_free_image_data(image); 
+
+
+	
 
 	GLuint id;
 	id = textures.size();
-	//Luodaan openGL tekstuuri
+	//Luodaan openGL tekstuuri --------------------
+	glGenTextures(1, &texture);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glUniform1i(id, 0);
+	//Ehkä voisi toteuttaa vasta siellä missä kutsutaan tekstuuria?
 
 	//Asetetaan tekstuuri unordered_mappiin, 
 	//annetaan sille nimi jolla sitä voi hakea
 	textures.insert(make_pair(name, id));
+
+	std::cout << "Loaded texture: " << name << std::endl;
+
+	
 }
 
 void TextureManager::deleteTexture(std::string name)

@@ -10,23 +10,22 @@
 #include <glm/gtx/transform.hpp>
 #include <iostream>
 #include <fstream>
-
-namespace
-{
-	GLuint texture;
-	GLuint loadBMP_custom(const char* filepath);
-}
+#include <SOIL.h>
 
 
 class TextureManager
 {
 public:
-
 	GLuint getTexture(std::string name);
 	TextureManager();
 	~TextureManager();
 private:
 
+	std::vector<unsigned char> png;
+	unsigned char* image;
+	int width, height;
+
+	GLuint texture;
 	std::unordered_map<std::string, GLuint> textures;
 	void loadTexture(std::string name, std::string filePath);
 	void deleteTexture(std::string name);
