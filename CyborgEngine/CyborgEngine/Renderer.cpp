@@ -69,6 +69,7 @@ void Renderer::initRender(GLFWwindow* w)
 	glBindVertexArray(VertexArrayID);
 
 	TM = new TextureManager;
+	TM->loadTexture("testi", "textures/default.png");
 
 	//Ladataan shaderit
 	//valmiissa ohjelmassa bool setShaders() -funktio ajonaikaiseen shaderien vaihtoon?
@@ -205,6 +206,8 @@ void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, fl
 void Renderer::drawTexturedTriangle(float x1, float y1, float x2, float y2, float x3, float y3, std::string file)
 {
 	//very experimental:
+	glUseProgram(textureProgramID);
+	
 	GLuint texture = TM->getTexture(file);
 
 	GLuint vb, ib;

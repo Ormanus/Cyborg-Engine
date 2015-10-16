@@ -17,6 +17,7 @@ class TextureManager
 {
 public:
 	GLuint getTexture(const std::string name);
+	void loadTexture(std::string name, std::string filePath);
 	TextureManager();
 	~TextureManager();
 private:
@@ -27,7 +28,6 @@ private:
 
 	 GLuint texture;
 	 std::unordered_map<std::string, GLuint> textures;
-	 void loadTexture(std::string name, std::string filePath);
 	 void deleteTexture(std::string name);
 
 	

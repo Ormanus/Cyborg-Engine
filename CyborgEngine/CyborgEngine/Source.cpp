@@ -43,6 +43,8 @@ int main()
 
 	float a = 0;
 
+	Renderer::drawTexturedTriangle(0.5, 0.5, 0.2, 0.2, 0.3, 0.3, "testi");
+
 	Polygon p;
 	glm::vec2 points[]
 	{

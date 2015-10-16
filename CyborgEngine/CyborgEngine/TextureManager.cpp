@@ -24,7 +24,7 @@ void TextureManager::loadTexture(std::string name, std::string filePath)
 
 
 	
-
+	glEnable(GL_TEXTURE_2D);
 	GLuint id;
 	id = textures.size();
 	//Luodaan openGL tekstuuri --------------------
