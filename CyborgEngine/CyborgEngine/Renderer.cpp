@@ -46,7 +46,6 @@ void Renderer::initDraw()
 	// ---------------------------
 }
 
-
 void Renderer::render()
 {
 	glfwSwapBuffers(window);
@@ -74,15 +73,15 @@ void Renderer::initRender(GLFWwindow* w)
 	//luodaan väribufferi. 
 	//TODO: siirrä muualle myöhemmin?
 
-	static const GLfloat g_color_buffer_data[] = {
-		DefaultColor.r, DefaultColor.g, DefaultColor.b,
-		DefaultColor.r, DefaultColor.g, DefaultColor.b,
-		DefaultColor.r, DefaultColor.g, DefaultColor.b,
-	};
+	//static const GLfloat g_color_buffer_data[] = {
+	//	DefaultColor.r, DefaultColor.g, DefaultColor.b,
+	//	DefaultColor.r, DefaultColor.g, DefaultColor.b,
+	//	DefaultColor.r, DefaultColor.g, DefaultColor.b,
+	//};
 
 	glGenBuffers(1, &colorbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+	//glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
 
 	//MVP näkyy shadereille
 	MVP_MatrixID = glGetUniformLocation(programID, "MVP");
