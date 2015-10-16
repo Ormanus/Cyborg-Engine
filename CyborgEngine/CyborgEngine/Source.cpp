@@ -51,7 +51,7 @@ int main()
 		Renderer::drawTriangle(-sin(a), -cos(a), sin(a*7), cos(a*7), -sin(a), cos(a*20));
 		Renderer::setColor(0, abs(cos(a * 10)), abs(cos(a * 13)), 1);
 		Renderer::drawRectangle(-0.75, -0.75, 0.75, 0.75);
-		Renderer::setColor(1, 1, 0, 1);
+		Renderer::setColor(Renderer::CYellow);
 		Renderer::drawPie(-0.5, 0, 0.5, 1-(abs(cos(a*16))/ 8));
 		Renderer::drawMultiColorTriangle(-0.25,-0.25,0.25,-0.25,0.25,0.25);
 		Renderer::setColor(1.0,0.0,0.0,1.0);

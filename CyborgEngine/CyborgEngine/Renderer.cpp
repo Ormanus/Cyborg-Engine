@@ -194,10 +194,11 @@ void Renderer::drawLine(float startPointX, float startPointY, float endPointX, f
 {
 	//Piirrä viiva:
 	//Onko tämä järkevä?????
+	//Korjasin yhden numeron, muuten näyttää hyvältä  t. Olli
 
 	GLuint bv, bi;
 
-GLfloat g_vertex_buffer_data[] = {
+	GLfloat g_vertex_buffer_data[] = {
 		startPointX, startPointY, 1.0f,
 		endPointX, endPointY, 1.0f,
 	};
@@ -240,7 +241,7 @@ GLfloat g_vertex_buffer_data[] = {
 		(void*)0            // array buffer offset
 		);
 
-	glDrawElements(GL_LINE_LOOP, 3, GL_UNSIGNED_BYTE, (GLvoid*)0);
+	glDrawElements(GL_LINE_LOOP, 2, GL_UNSIGNED_BYTE, (GLvoid*)0);
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 
@@ -262,4 +263,12 @@ void Renderer::setColor(float r, float g, float b, float a)
 	};
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+}
+
+void Renderer::setColor(int color)
+{
+	float r = (float)((color >> 16) & 0xFF) / 255;
+	float g = (float)((color >> 8) & 0xFF) / 255;
+	float b = (float)((color >> 0) & 0xFF) / 255;
+	setColor(r, g, b, 1);
 }
