@@ -43,7 +43,7 @@ int main()
 
 	float a = 0;
 
-	Renderer::drawTexturedTriangle(0.5, 0.5, 0.2, 0.2, 0.3, 0.3, "testi");
+	
 
 	Polygon p;
 	glm::vec2 points[]
@@ -66,13 +66,17 @@ int main()
 		//clear screen
 		Renderer::initDraw();
 		//draw
+		
+
 		for (int i = 0; i < 8; i++)
 		{
+
 			Renderer::setColor(0, 1, (float)i/8, 1);
 			p.setRotation(a+i*3.14159265/4);
 			Renderer::drawPolygon(&p, 0, 0);
-		}
 
+		}
+		Renderer::drawTexturedTriangle(1, 0.5, 0.2, 0, 0.3, -0.3, "testi");
 		//swap buffers
 		Renderer::render();
 		glfwPollEvents();

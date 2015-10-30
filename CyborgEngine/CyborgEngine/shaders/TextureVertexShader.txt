@@ -1,7 +1,7 @@
 #version 120
 
-layout(location=VERTEX_POSITION)in vec3 vertexPosition_modelspace;
-layout(location=TEXTURE_DATA)in vec2 vertexUV;
+in vec3 vertexPosition_modelspace;
+in vec2 vertexUV;
 
 varying out vec2 UV;
 
