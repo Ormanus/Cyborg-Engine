@@ -104,13 +104,13 @@ void Renderer::drawRectangle(float x1, float y1, float x2, float y2)
 	drawTriangle(x1, y1, x1, y2, x2, y2);
 	drawTriangle(x1, y1, x2, y1, x2, y2);
 }
-
 void Renderer::drawCircle(float x, float y, float r)
 {
 	float angle = 2.0*3.14159265 / 64;
 	for (int i = 0; i < 64; i++)
 	{
 		drawTriangle(x, y, x + cos(angle * i)*r, y + sin(angle * i)*r, x + cos(angle * (i + 1))*r, y + sin(angle * (i + 1))*r);
+
 	}
 }
 
@@ -120,12 +120,33 @@ void Renderer::drawPie(float x, float y, float r,float a)
 	for (int i = 0; i < 64; i++)
 	{
 		drawTriangle(x, y, x + cos(angle * i)*r, y + sin(angle * i)*r, x + cos(angle * (i + 1))*r, y + sin(angle * (i + 1))*r);
+		
 	}
 }
-void Renderer::drawMultiColorTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
+void Renderer::drawMultiColorTriangle(float x1, float y1, float x2, float y2, float x3, float y3, int color1, int color2, int color3)
 {
 	//Tämä valmiiksi sitten kun saadaan väreille ne nimet
-	setColor(1.0,1.0,1.0,1.0);
+	float r = (float)((color1 >> 16) & 0xFF) / 255;
+	float g = (float)((color1 >> 8) & 0xFF) / 255;
+	float b = (float)((color1 >> 0) & 0xFF) / 255;
+
+	float r2 = (float)((color2 >> 16) & 0xFF) / 255;
+	float g2 = (float)((color2 >> 8) & 0xFF) / 255;
+	float b2 = (float)((color2 >> 0) & 0xFF) / 255;
+
+	float r3 = (float)((color3 >> 16) & 0xFF) / 255;
+	float g3 = (float)((color3 >> 8) & 0xFF) / 255;
+	float b3= (float)((color3 >> 0) & 0xFF) / 255;
+
+	GLfloat g_color_buffer_data[] = 
+	{
+		r , g , b,
+		r2 , g2 , b2 ,
+		r3 , g3 , b3 ,
+	};
+	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+
 	drawTriangle(x1,y1,x2,y2,x3,y3);
 	
 }
@@ -189,6 +210,8 @@ void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, fl
 	glDeleteBuffers(1, &ib);
 
 	N_shapes++;
+
+	
 }
 void Renderer::drawLine(float startPointX, float startPointY, float endPointX, float endPointY,float width)
 {
@@ -247,7 +270,9 @@ void Renderer::drawLine(float startPointX, float startPointY, float endPointX, f
 
 	
 	glDeleteBuffers(1, &bv);
-	glDeleteBuffers(1, &bi);
+	glDeleteBuffers(1, &bi);	
+
+	
 }
 void Renderer::setColor(float r, float g, float b, float a)
 {
