@@ -70,7 +70,7 @@ void Renderer::initRender(GLFWwindow* w)
 	glBindVertexArray(VertexArrayID);
 
 	TM = new TextureManager;
-	TM->loadTexture("testi", "./textures/default.bmp");
+	TM->loadTexture("testi", "./textures/default.png");
 
 	//Ladataan shaderit
 	//valmiissa ohjelmassa bool setShaders() -funktio ajonaikaiseen shaderien vaihtoon?
