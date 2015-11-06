@@ -73,10 +73,12 @@ int main()
 
 			Renderer::setColor(0, 1, (float)i/8, 1);
 			p.setRotation(a+i*3.14159265/4);
-			Renderer::drawPolygon(&p, 0, 0);
+			Renderer::drawPolygonTextured(&p, 0, 0, "testi");
 
 		}
-		Renderer::drawTexturedTriangle(1, 0.5, 0.2, 0, 0.3, -0.3, "testi");
+
+		//Renderer::drawTexturedTriangle(0.5, 1.0, 0.0, 0.5, -1.0, 0.0, "testi");
+
 		//swap buffers
 		Renderer::render();
 		glfwPollEvents();

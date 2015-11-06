@@ -13,7 +13,7 @@ Polygon::~Polygon()
 
 void Polygon::setPoints(glm::vec2* p, int size)
 {
-	float maxX = 0, maxY = 0, minX = 0, minY = 0;
+	//float maxX = 0, maxY = 0, minX = 0, minY = 0;
 	points.clear();
 	points.push_back(glm::vec2(0, 0)); //center
 	for (int i = 0; i < size; i++)
