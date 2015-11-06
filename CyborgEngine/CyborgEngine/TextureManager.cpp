@@ -1,5 +1,4 @@
 #include "TextureManager.h"
-#include "texture.hpp"
 
 TextureManager::TextureManager()
 {
@@ -15,7 +14,6 @@ TextureManager::~TextureManager()
 
 void TextureManager::loadTexture(std::string name, std::string filePath)
 {
-
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -30,14 +28,11 @@ void TextureManager::loadTexture(std::string name, std::string filePath)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	//luodaan tekstuuri
 
-	std::cout << "image:\n" << image;
-
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 	textures.insert(make_pair(name, texture));
-	SOIL_free_image_data(image);
-
-	std::cout << "Loaded texture: " << name << std::endl;
 	//Vapautetaan muistista käytön jälkeen
+	SOIL_free_image_data(image);
+	std::cout << "Loaded texture: " << name << std::endl;
 }
 
 
