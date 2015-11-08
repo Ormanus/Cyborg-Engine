@@ -62,7 +62,7 @@ int main()
 	p.setOrigin(-0.5, 0.0);
 
 	do{
-		a += 0.01;
+		a += 0.02;
 		//clear screen
 		Renderer::initDraw();
 		//draw
@@ -74,7 +74,7 @@ int main()
 			Renderer::setColor(0, 1, (float)i/8, 1);
 			p.setRotation(a+i*3.14159265/4);
 			Renderer::drawPolygonTextured(&p, 0, 0, "testi");
-
+			//Renderer::drawPolygon(&p, -0.5, 0);
 		}
 
 		//Renderer::drawTexturedTriangle(0.5, 1.0, 0.0, 0.5, -1.0, 0.0, "testi");

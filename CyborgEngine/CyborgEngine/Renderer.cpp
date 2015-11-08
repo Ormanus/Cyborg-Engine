@@ -5,14 +5,14 @@
 namespace {
 	GLuint programID;
 	GLuint textureProgramID;
-	GLuint vertexbuffer;
+	//GLuint vertexbuffer;
 	GLuint VertexArrayID;
-	GLuint indexbuffer;
+	//GLuint indexbuffer;
 	GLFWwindow* window; 
 	glm::mat4 MVP(1.0);
 	GLuint MVP_MatrixID;
 	GLuint TextureID;
-	GLuint uvbuffer;
+	//GLuint uvbuffer;
 	GLuint colorbuffer;
 	GLuint Texture;
 	glm::mat4 VP;
@@ -102,9 +102,9 @@ void Renderer::initRender(GLFWwindow* w)
 void Renderer::uninitRender()
 {
 	// ???
-	glDeleteBuffers(1, &vertexbuffer);
-	glDeleteBuffers(1, &indexbuffer);
-	glDeleteBuffers(1, &colorbuffer);
+	//glDeleteBuffers(1, &vertexbuffer);
+	//glDeleteBuffers(1, &indexbuffer);
+	//glDeleteBuffers(1, &colorbuffer);
 }
 
 void Renderer::drawRectangle(float x1, float y1, float x2, float y2)
@@ -133,14 +133,19 @@ void Renderer::drawPie(float x, float y, float r,float a)
 
 void Renderer::drawPolygon(Polygon* p, const float x, const float y)
 {
-	std::vector<glm::vec2>* pp = p->getPoints();
-	glm::vec2 c = pp->at(0);
-	unsigned const N_points = pp->size();
-	for (unsigned i = 1; i < N_points-1; i++) //aloita 1:stä, koska ensimmäinen vec2 on kuvion keskipiste
+	glm::vec2* points = p->getPoints();
+	const int numPoints = p->getNumPoints();
+	glm::vec2 c = points[0];
+	for (unsigned i = 1; i < numPoints+1; i++) //aloita 1:stä, koska ensimmäinen vec2 on kuvion keskipiste
 	{
-	drawTriangle(x + c.x, y + c.y, x + pp->at(i).x, y + pp->at(i).y, x + pp->at(i + 1).x, y + pp->at(i + 1).y);
+		glm::vec2 next = (i == numPoints) ? points[1] : points[i + 1];
+		glm::mat4 MVP_saved = MVP;
+		MVP = MVP * glm::translate(glm::vec3(p->getOrigin(), 0));
+		MVP = MVP * glm::rotate(p->getRotation(), glm::vec3(0, 0, 1));
+		drawTriangle(x + c.x, y + c.y, x + points[i].x, y + points[i].y, x + next.x, y + next.y);
+		MVP = MVP_saved;
 	}
-	drawTriangle(x + c.x, y + c.y, x + pp->at(N_points - 1).x, y + pp->at(N_points - 1).y, x + pp->at(1).x, y + pp->at(1).y);
+	//drawTriangle(x + c.x, y + c.y, x + pp->at(N_points - 1).x, y + pp->at(N_points - 1).y, x + pp->at(1).x, y + pp->at(1).y);
 }
 
 void Renderer::drawPolygonTextured(Polygon* p, const float x, const float y, std::string textureName)
@@ -149,21 +154,24 @@ void Renderer::drawPolygonTextured(Polygon* p, const float x, const float y, std
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	//get points from polygon
-	std::vector<glm::vec2>* points = p->getPoints();
+	glm::vec2* points = p->getPoints();
+
+	int numTriangles = p->getNumPoints();
 
 	GLuint vertexBuffer, indexBuffer, uvBuffer;
 
-	GLfloat* vertexData = new GLfloat[points->size() * 3];
+	GLfloat* vertexData = new GLfloat[numTriangles * 3];
 
 	//save points to an array
 	/*vertexBufferData[0] = points->at(0).x;
 	vertexBufferData[1] = points->at(0).y;*/
 
 	glm::mat4 MVP_temp = MVP;
-
+	MVP_temp = MVP_temp * glm::translate(glm::vec3(p->getOrigin(), 0));
+	MVP_temp = MVP_temp * glm::rotate(p->getRotation(), glm::vec3(0, 0, 1));
 	//MVP_temp = MVP_temp*glm::translate(glm::vec3(0, 0, 1));
 
-	for (int i = 0; i < points->size(); i++)
+	for (int i = 0; i < numTriangles; i++)
 	{
 		/*vertexData[i * 3 + 0] = points->at(i).x + 1;
 		vertexData[i * 3 + 1] = points->at(i).y + 1;
@@ -200,37 +208,37 @@ void Renderer::drawPolygonTextured(Polygon* p, const float x, const float y, std
 	float width = p->getMax().x - p->getMin().x;
 	float height = p->getMax().y - p->getMin().y;
 
-	GLfloat* uvData = new GLfloat[points->size()*3];
+	GLfloat* uvData = new GLfloat[numTriangles * 3];
 
-	uvData[0] = points->at(0).x;
-	uvData[0] = points->at(0).y;
+	uvData[0] = points[0].x;
+	uvData[0] = points[0].y;
 
-	for (int i = 1; i < points->size(); i++)
+	for (int i = 1; i < numTriangles-1; i++)
 	{
-		uvData[i * 2 + 2] = points->at(i).x;
-		uvData[i * 2 + 3] = points->at(i).y;
+		uvData[i * 2 + 2] = 0;// points[i].x;
+		uvData[i * 2 + 3] = 0;// points[i].y;
 	}
 
 	//generate buffer
 	glGenBuffers(1, &uvBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*(points->size()) * 2, uvData, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*(numTriangles)* 2, uvData, GL_DYNAMIC_DRAW);
 
 	//do some magic to set correct point order
-	GLubyte* indexData = new GLubyte[points->size()*3];
-	for (int i = 0; i < points->size()-1; i++)
+	GLubyte* indexData = new GLubyte[numTriangles * 3];
+	for (int i = 0; i < numTriangles - 1; i++)
 	{
 		indexData[i * 3 + 0] = 0;
 		indexData[i * 3 + 1] = i;
 		indexData[i * 3 + 2] = i+1;
 	}
-	indexData[(points->size()-1) * 3 + 0] = 0;
-	indexData[(points->size()-1) * 3 + 1] = points->size()-1;
-	indexData[(points->size()-1) * 3 + 2] = 1;
+	indexData[(numTriangles - 1) * 3 + 0] = 0;
+	indexData[(numTriangles - 1) * 3 + 1] = numTriangles - 1;
+	indexData[(numTriangles - 1) * 3 + 2] = 1;
 
 	glGenBuffers(1, &indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLubyte)*points->size() * 3, indexData, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLubyte)*numTriangles * 3, indexData, GL_DYNAMIC_DRAW);
 
 	//send the Most Valuable Player of Matrix to GPU
 	glUniformMatrix4fv(MVP_MatrixID, 1, GL_FALSE, &MVP_temp[0][0]);
@@ -261,7 +269,7 @@ void Renderer::drawPolygonTextured(Polygon* p, const float x, const float y, std
 	//glEnableClientState(GL_VERTEX_ARRAY);             // activate vertex coords array
 	//glVertexPointer(3, GL_FLOAT, 0, 0);               // last param is offset, not ptr
 
-	glDrawElements(GL_TRIANGLES, (points->size())*3, GL_UNSIGNED_BYTE, (GLvoid*)0);
+	glDrawElements(GL_TRIANGLES, (numTriangles)*3, GL_UNSIGNED_BYTE, (GLvoid*)0);
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 
@@ -424,6 +432,9 @@ void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, fl
 void Renderer::drawTexturedTriangle(float x1, float y1, float x2, float y2, float x3, float y3, std::string textureName)
 {
 	//way too experimental:
+
+	GLuint uvbuffer;
+
 	glEnable(GL_TEXTURE_2D);
 
 	glUseProgram(textureProgramID);
