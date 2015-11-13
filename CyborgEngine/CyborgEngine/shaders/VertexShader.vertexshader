@@ -1,15 +1,15 @@
-#version 120 
+#version 330 core
 
 //Defined also in vertexshader.h
 #define VERTEX_POSITION 0
 #define VERTEX_COLOR 1
 
 // Input vertex data, different for all executions of this shader.
- in vec3 vertexPosition_modelspace;
- in vec3 vertexColor;
+layout(location = VERTEX_POSITION) in vec3 vertexPosition_modelspace;
+layout(location = VERTEX_COLOR) in vec3 vertexColor;
 
 // Output data ; will be interpolated for each fragment.
-varying vec3 fragmentColor;
+out vec3 fragmentColor;
 
 void main() {
 	gl_Position.xyz =  vertexPosition_modelspace;

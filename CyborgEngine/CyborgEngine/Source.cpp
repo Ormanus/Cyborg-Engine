@@ -2,9 +2,8 @@
 #define GLM_FORCE_RADIANS
 
 #include "Renderer.h"
-#include "Camera.hpp"
 GLFWwindow* window;
-
+#include "Camera.hpp"
 int main()
 {
 
@@ -19,7 +18,8 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	int w = 1024;
+	//int w = 1024;
+	int w = 768;
 	int h = 768;
 	window = glfwCreateWindow(w, h,
 		"Cyborg-Engine", NULL, NULL);
@@ -43,32 +43,52 @@ int main()
 
 	float a = 0;
 
+	
+
+	Polygon p;
+	glm::vec2 points[]
+	{
+		
+		glm::vec2(0.0, 0.21),
+		glm::vec2(0.05, 0.05),
+		glm::vec2(0.4, 0.0),
+		glm::vec2(0.05, -0.05),
+		glm::vec2(0.0, -0.21),
+		glm::vec2(-0.05, -0.05),
+		glm::vec2(-0.4, 0.0),
+		glm::vec2(-0.05, 0.05),
+	};
+	p.setPoints(points, 8);
+	p.setOrigin(-0.5, 0.0);
+
 	do{
 		a += 0.01;
-		//render stuff
+		//clear screen
 		Renderer::initDraw();
-		Renderer::setColor(1, 0.5, 0, 1);
-		Renderer::drawTriangle(sin(a), cos(a), -sin(a*7), -cos(a*7), sin(a), -cos(a*20));
-		Renderer::drawTriangle(-sin(a), -cos(a), sin(a*7), cos(a*7), -sin(a), cos(a*20));
-		Renderer::setColor(0, abs(cos(a * 10)), abs(cos(a * 13)), 1);
-		Renderer::drawRectangle(-0.75, -0.75, 0.75, 0.75);
-		Renderer::setColor(Renderer::CGreen);
-		Renderer::drawPie(-0.5, 0, 0.5, 1-(abs(cos(a*16))/ 8));
-		Renderer::drawMultiColorTriangle(-0.25, -0.25, 0.25, -0.25, 0.25, 0.25,Renderer::CBlue,Renderer::CRed,Renderer::CMagneta);
-		Renderer::setColor(Renderer::CRed);
-		Renderer::drawLine(sin(a),cos(a),-sin(a),-cos(a),5.0);
+		//draw
+		
+		for (int i = 0; i < 8; i++)
+		{
+			Renderer::setColor(0, 1, (float)i/8, 1);
+			p.setRotation(a+i*3.14159265/4);
+			Renderer::drawPolygon(&p, 0, 0);
+		}
+		
+		Renderer::drawTexturedRectangle(0.5, 0.5, 0.3, 0.3, "default");
+		//Renderer::drawTexturedTriangle(1, 0.5, 0.2, 0, 0.3, -0.3, "aaa");
+
+		//swap buffers
 		Renderer::render();
 		glfwPollEvents();
 	} while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		glfwWindowShouldClose(window) == 0);
-		
-	//Camera stuff
-		/*computeMatrices();
-		glm::mat4 ProjectionMatrix = getProjectionMatrix();
-		glm::mat4 ViewMatrix = getViewMatrix();
-		glm::mat4 ModelMatrix = glm::mat4(1.0);
-		glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix; */
 
+	//Camera stuff
+	/*computeMatrices();
+	glm::mat4 ProjectionMatrix = getProjectionMatrix();
+	glm::mat4 ViewMatrix = getViewMatrix();
+	glm::mat4 ModelMatrix = glm::mat4(1.0);
+	glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix; */
 	Renderer::uninitRender();
 	glfwTerminate();
 	return 0;
