@@ -2,6 +2,7 @@
 #define GLM_FORCE_RADIANS
 
 #include "Renderer.h"
+#include "Circle.h"
 GLFWwindow* window;
 
 int main()
@@ -61,17 +62,24 @@ int main()
 	p.setPoints(points, 8);
 	p.setOrigin(-0.5, 0.0);
 
+	Circle c;
+	c.setPrecision(8);
+
 	do{
 		a += 0.02;
 		//clear screen
 		Renderer::initDraw();
 		//draw
-		
+		Renderer::setColor((sin(a)+1)/10, 0, 0, 1);
+		Renderer::drawPolygon(&c, 0, 0);
+
+		c.setRotation(a);
+
 		//Renderer::drawTexturedTriangle(0.0, 0.0, 1.0, 1.0, -1.0, 0.0, "testi");
+		Renderer::setColor(0.0f, 0.0f, 0.0f, 1);
 		for (int i = 0; i < 8; i++)
 		{
 			p.setRotation(a + i*3.14159265 / 4);
-			Renderer::setColor(0.3, 0.1, 0, 1);
 			Renderer::drawPolygon(&p, 0, 0);
 		}
 		for (int i = 0; i < 8; i++)

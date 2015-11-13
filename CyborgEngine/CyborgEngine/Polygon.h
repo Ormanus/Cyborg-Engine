@@ -8,7 +8,7 @@ class Polygon
 {
 public:
 	Polygon();
-	~Polygon();
+	virtual ~Polygon();
 
 	//get
 	glm::vec2 getOrigin()const{ return origin; }
@@ -24,9 +24,9 @@ public:
 	void setOrigin(float x, float y){ origin.x = x; origin.y = y; }
 	void setRotation(float angle){ rotation = angle; }
 	void setPoints(glm::vec2* p, int size);
-private:
+protected:
 	glm::vec2* points;
-	std::vector<glm::vec2*> rotatedPoints;
+	//std::vector<glm::vec2*> rotatedPoints;
 	int numPoints = 0;
 	float maxX = 0, maxY = 0, minX = 0, minY = 0;
 	glm::vec2 origin;
