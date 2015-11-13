@@ -72,6 +72,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="common\shader.cpp" />
+    <ClCompile Include="Font.cpp" />
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Source.cpp" />
@@ -80,6 +81,8 @@
   <ItemGroup>
     <ClInclude Include="Camera.hpp" />
     <ClInclude Include="common\shader.hpp" />
+    <ClInclude Include="Font.h" />
+    <ClInclude Include="ft2build.h" />
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="TextureManager.h" />
