@@ -2,6 +2,7 @@
 #define GLM_FORCE_RADIANS
 
 #include "Renderer.h"
+#include "Camera.hpp"
 GLFWwindow* window;
 
 int main()
@@ -56,12 +57,17 @@ int main()
 		Renderer::drawMultiColorTriangle(-0.25, -0.25, 0.25, -0.25, 0.25, 0.25,Renderer::CBlue,Renderer::CRed,Renderer::CMagneta);
 		Renderer::setColor(Renderer::CRed);
 		Renderer::drawLine(sin(a),cos(a),-sin(a),-cos(a),5.0);
-		
 		Renderer::render();
 		glfwPollEvents();
 	} while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		glfwWindowShouldClose(window) == 0);
-
+		
+	//Camera stuff
+		/*computeMatrices();
+		glm::mat4 ProjectionMatrix = getProjectionMatrix();
+		glm::mat4 ViewMatrix = getViewMatrix();
+		glm::mat4 ModelMatrix = glm::mat4(1.0);
+		glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix; */
 
 	Renderer::uninitRender();
 	glfwTerminate();
