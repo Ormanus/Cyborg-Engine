@@ -4,7 +4,7 @@
 #include "Renderer.h"
 #include "Circle.h"
 GLFWwindow* window;
-
+#include "Camera.hpp"
 int main()
 {
 
@@ -75,7 +75,9 @@ int main()
 
 		c.setRotation(a);
 
+		//why does this set the drawing color???
 		//Renderer::drawTexturedTriangle(0.0, 0.0, 1.0, 1.0, -1.0, 0.0, "testi");
+
 		Renderer::setColor(0.0f, 0.0f, 0.0f, 1);
 		for (int i = 0; i < 8; i++)
 		{
@@ -87,13 +89,19 @@ int main()
 			p.setRotation(a+i*3.14159265/4);
 			Renderer::drawPolygonTextured(&p, -0.5f, 0, "testi");
 		}
+
 		//swap buffers
 		Renderer::render();
 		glfwPollEvents();
 	} while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		glfwWindowShouldClose(window) == 0);
 
-
+	//Camera stuff
+	/*computeMatrices();
+	glm::mat4 ProjectionMatrix = getProjectionMatrix();
+	glm::mat4 ViewMatrix = getViewMatrix();
+	glm::mat4 ModelMatrix = glm::mat4(1.0);
+	glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix; */
 	Renderer::uninitRender();
 	glfwTerminate();
 	return 0;

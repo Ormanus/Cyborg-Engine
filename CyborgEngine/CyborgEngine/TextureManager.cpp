@@ -2,7 +2,8 @@
 
 TextureManager::TextureManager()
 {
-
+	//Ladataan oletus tekstuuri kun texturemanager luodaan.
+	loadTexture("default", "./textures/default.png");
 }
 
 TextureManager::~TextureManager()
@@ -20,8 +21,12 @@ void TextureManager::loadTexture(std::string name, std::string filePath)
 	//ladataan kuva tiedostosta (PNG, BMP, JPG, TGA, DDS, PSD, HDR)
 	const char* c = filePath.c_str();
 	unsigned char* image = SOIL_load_image(c, &width, &height, 0, SOIL_LOAD_RGB);
-	if (image == NULL)            // Throw error if load fails
+
+	if (image == NULL) // Error jos kuvan lataus epäonnistuu
+	{
 		std::cout << "Could not load image \"" + name + "\"\n" + SOIL_last_result();
+	}
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -30,23 +35,12 @@ void TextureManager::loadTexture(std::string name, std::string filePath)
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 	textures.insert(make_pair(name, texture));
-	//Vapautetaan muistista käytön jälkeen
+
+	//Vapautetaan kuva data muistista käytön jälkeen
+
 	SOIL_free_image_data(image);
 	std::cout << "Loaded texture: " << name << std::endl;
 }
-
-
-
-//void TextureManager::loadTexture(std::string name, std::string filePath)
-//{
-//	//ladataan kuva tiedostosta (PNG, BMP, JPG, TGA, DDS, PSD, HDR)
-//	const char* c = filePath.c_str();
-//	GLuint texture = loadBMP_custom(c);//SOIL_load_OGL_texture(c, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_MULTIPLY_ALPHA);
-//	textures.insert(make_pair(name, texture));
-//
-//	std::cout << "Loaded texture: " << name << std::endl;
-//	//Vapautetaan muistista käytön jälkeen
-//}
 
 void TextureManager::deleteTexture(std::string name)
 {
@@ -68,14 +62,15 @@ void TextureManager::deleteTexture(std::string name)
 
 GLuint TextureManager::getTexture(std::string name)
 {
-	auto i = textures.find(name);
+		auto i = textures.find(name);
 
-	if (i == textures.end())
-	{
-		std::cout << "Texture with this name doesn't exist." << std::endl;
-		return 0;
-	}
-
-	return i->second;
-
+		if (i == textures.end())
+		{
+			std::cout << "Texture: " << name << " does not exist. Replaced with default texture" << std::endl;
+			return getTexture("default");
+		}
+		else
+		{
+			return i->second;
+		}
 }
