@@ -1,19 +1,19 @@
 #include "Renderer.h"
 #include "common\shader.hpp"
 
-#define PII 3.14159265
+#define PI 3.14159265
 
 namespace {
 	GLuint programID;
 	GLuint textureProgramID;
-	GLuint vertexbuffer;
+	//GLuint vertexbuffer;
 	GLuint VertexArrayID;
-	GLuint indexbuffer;
-	GLFWwindow* window;
+	//GLuint indexbuffer;
+	GLFWwindow* window; 
 	glm::mat4 MVP(1.0);
 	GLuint MVP_MatrixID;
 	GLuint TextureID;
-	GLuint uvbuffer;
+	//GLuint uvbuffer;
 	GLuint colorbuffer;
 	GLuint Texture;
 	glm::mat4 VP;
@@ -23,7 +23,8 @@ namespace {
 };
 
 void Renderer::FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
-	glViewport(0, 0, width, height);
+	float scale = width / height;
+	glViewport(0, 0, width / scale, height);
 }
 
 void Renderer::initDraw()
@@ -71,6 +72,7 @@ void Renderer::initRender(GLFWwindow* w)
 	glBindVertexArray(VertexArrayID);
 
 	TM = new TextureManager;
+	TM->loadTexture("testi", "./textures/polygon.png");
 
 	//Ladataan shaderit
 	//valmiissa ohjelmassa bool setShaders() -funktio ajonaikaiseen shaderien vaihtoon?
@@ -102,9 +104,9 @@ void Renderer::initRender(GLFWwindow* w)
 void Renderer::uninitRender()
 {
 	// ???
-	glDeleteBuffers(1, &vertexbuffer);
-	glDeleteBuffers(1, &indexbuffer);
-	glDeleteBuffers(1, &colorbuffer);
+	//glDeleteBuffers(1, &vertexbuffer);
+	//glDeleteBuffers(1, &indexbuffer);
+	//glDeleteBuffers(1, &colorbuffer);
 }
 
 void Renderer::drawRectangle(float x1, float y1, float x2, float y2)
@@ -128,6 +130,29 @@ void Renderer::drawPie(float x, float y, float r,float a)
 	for (int i = 0; i < 64; i++)
 	{
 		drawTriangle(x, y, x + cos(angle * i)*r, y + sin(angle * i)*r, x + cos(angle * (i + 1))*r, y + sin(angle * (i + 1))*r);
+	}
+}
+
+void Renderer::drawPolygon(Polygon* p, const float x, const float y)
+{
+	glm::vec2* points = p->getPoints();
+	const int numPoints = p->getNumPoints();
+	glm::vec2 c = points[0];
+
+	float x0 = p->getOrigin().x;
+	float y0 = p->getOrigin().y;
+
+	for (unsigned i = 1; i < numPoints+1; i++) //aloita 1:stä, koska ensimmäinen vec2 on kuvion keskipiste
+	{
+		glm::vec2 next = (i == numPoints) ? points[1] : points[i + 1];
+		glm::mat4 MVP_saved = MVP;
+		
+		MVP = MVP * glm::translate(glm::vec3(x, y, 0));
+		MVP = MVP * glm::rotate(p->getRotation(), glm::vec3(0, 0, 1));
+		MVP = MVP * glm::translate(glm::vec3(p->getOrigin(), 0));
+
+		drawTriangle(c.x, c.y, points[i].x, points[i].y, next.x, next.y);
+		MVP = MVP_saved;
 	}
 }
 
@@ -159,27 +184,131 @@ void Renderer::drawMultiColorTriangle(float x1, float y1, float x2, float y2, fl
 
 }
 
-void Renderer::drawPolygon(Polygon* p, const float x, const float y)
+void Renderer::drawPolygonTextured(Polygon* p, const float x, const float y, std::string textureName)
 {
-	std::vector<glm::vec2>* pp = p->getPoints();
-	glm::vec2 c = pp->at(0);
-	unsigned const N_points = pp->size();
-	for (unsigned i = 1; i < N_points-1; i++) //aloita 1:stä, koska ensimmäinen vec2 on kuvion keskipiste
+	//get points from polygon
+	glm::vec2* points = p->getPoints();
+	int numTriangles = p->getNumPoints();
+
+	GLuint uvbuffer;
+
+	glEnable(GL_TEXTURE_2D);
+
+	glUseProgram(textureProgramID);
+	TextureID = glGetUniformLocation(textureProgramID, "myTextureSampler");
+
+	GLuint texture = TM->getTexture(textureName);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glUniform1i(TextureID, 0);
+
+	glm::mat4 MVP_temp = MVP;
+	MVP = MVP * glm::translate(glm::vec3(x, y, 0));
+	MVP = MVP * glm::rotate(p->getRotation(), glm::vec3(0, 0, 1));
+	//MVP = MVP * glm::scale(glm::vec3(0.5f, 0.5f, 0.5f));
+
+	float width = p->getMax().x - p->getMin().x;
+	float height = p->getMax().y - p->getMin().y;
+
+	GLfloat* uvData = new GLfloat[(numTriangles+1) * 3];
+	
+	//uvData[0] = points[0].x;
+	//uvData[0] = points[0].y;
+
+	float minX = p->getMin().x;
+	float minY = p->getMin().y;
+
+	float maxX = p->getMax().x;
+	float maxY = p->getMax().y;
+
+	for (int i = 0; i < numTriangles+1; i++)
 	{
-		drawTriangle(x + c.x, y + c.y, x + pp->at(i).x, y + pp->at(i).y, x + pp->at(i + 1).x, y + pp->at(i + 1).y);
+		uvData[i * 2 + 0] = (points[i].x - minX) / width;
+		uvData[i * 2 + 1] = (points[i].y - minY) / height;
 	}
-	drawTriangle(x + c.x, y + c.y, x + pp->at(N_points - 1).x, y + pp->at(N_points - 1).y, x + pp->at(1).x, y + pp->at(1).y);
+
+	glGenBuffers(1, &uvbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*(numTriangles + 1) * 2, uvData, GL_DYNAMIC_DRAW);
+
+	GLuint vb, ib;
+
+	GLfloat* vertexData = new GLfloat[(numTriangles + 1) * 3];
+	for (int i = 0; i < (numTriangles + 1); i++)
+	{	
+		vertexData[i * 3 + 0] = points[i].x + p->getOrigin().x; //x
+		vertexData[i * 3 + 1] = points[i].y + p->getOrigin().y; //y
+		vertexData[i * 3 + 2] = 1.0f;		 //z
+	}
+
+	glGenBuffers(1, &vb);
+	glBindBuffer(GL_ARRAY_BUFFER, vb);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*(numTriangles+1)*3, vertexData, GL_DYNAMIC_DRAW);
+
+	GLubyte* indexData = new GLubyte[(numTriangles+1) * 3];
+	for (int i = 0; i < numTriangles; i++)
+	{
+		indexData[i * 3 + 0] = 0;
+		indexData[i * 3 + 1] = i;
+		indexData[i * 3 + 2] = i+1;
+	}
+	indexData[(numTriangles) * 3 + 0] = 0;
+	indexData[(numTriangles) * 3 + 1] = numTriangles;
+	indexData[(numTriangles) * 3 + 2] = 1;
+
+	glGenBuffers(1, &ib);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLubyte)*(numTriangles+1)*3, indexData, GL_DYNAMIC_DRAW);
+
+	glUniformMatrix4fv(MVP_MatrixID, 1, GL_FALSE, &MVP[0][0]);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(
+		0,                  // attribute 
+		3,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+		);
+
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glVertexAttribPointer(
+		1,                  // attribute 1
+		2,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+		);
+
+
+	glDrawElements(GL_TRIANGLES, (numTriangles+1)*3, GL_UNSIGNED_BYTE, (GLvoid*)0);
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+
+
+	glDeleteBuffers(1, &vb);
+	glDeleteBuffers(1, &ib);
+	glDeleteBuffers(1, &uvbuffer);
+
+	delete[] uvData;
+	delete[] indexData;
+	delete[] vertexData;
+
+	glDisable(GL_TEXTURE_2D);
+
+	MVP = MVP_temp;
 }
 
 void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
 {
-	//piirrä kolmio:
-	//Toimii toistaiseksi. Optimointi edelleen kesken.
-	//Tällä hetkellä todennäköisesti hidas, mutta ei kuitenkaan vuoda liikaa muistia...
-
 	GLuint vb, ib;
 
-	/*static const */GLfloat g_vertex_buffer_data[] = {
+	GLfloat g_vertex_buffer_data[] = {
 		x1, y1, 1.0f,
 		x2, y2, 1.0f,
 		x3, y3, 1.0f,
@@ -228,32 +357,44 @@ void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, fl
 
 	glDeleteBuffers(1, &vb);
 	glDeleteBuffers(1, &ib);
-
-	N_shapes++;
 }
 
 void Renderer::drawTexturedTriangle(float x1, float y1, float x2, float y2, float x3, float y3, std::string textureName)
 {
-	//Tekstuuri temput ---------
+	//way too experimental:
+
+	GLuint uvbuffer;
+
 	glEnable(GL_TEXTURE_2D);
+
 	glUseProgram(textureProgramID);
 	TextureID = glGetUniformLocation(textureProgramID, "myTextureSampler");
+	
+	
+	//GLuint texture = loadBMP_custom("textures/default.bmp");
+	//glGenTextures(1, &texture);
+
 	GLuint texture = TM->getTexture(textureName);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glUniform1i(TextureID, 0);
-	//-----------------------------
 
-	static const GLfloat g_uv_buffer_data[] =
-	{
-		0.0, 0.0,
-		1.0, 0.0,
-		0.0, 1.0,
-	};
+	glUniform1i(TextureID, 0);
+
+	GLfloat* g_uv_buffer_data = new GLfloat[6];
+
+	//static const GLfloat g_uv_buffer_data[] =
+	//{
+	//	0.0, 0.0,
+	//	1.0, 0.0,
+	//	0.0, 1.0,
+	//};
+	g_uv_buffer_data[0] = 0.0; g_uv_buffer_data[1] = 0.0;
+	g_uv_buffer_data[2] = 1.0; g_uv_buffer_data[3] = 0.0;
+	g_uv_buffer_data[4] = 0.0; g_uv_buffer_data[5] = 1.0;
 
 	glGenBuffers(1, &uvbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, /*sizeof(g_uv_buffer_data)*/6*sizeof(GLfloat), g_uv_buffer_data, GL_DYNAMIC_DRAW);
 
 	GLuint vb, ib;
 
@@ -308,8 +449,86 @@ void Renderer::drawTexturedTriangle(float x1, float y1, float x2, float y2, floa
 	glDeleteBuffers(1, &vb);
 	glDeleteBuffers(1, &ib);
 	glDeleteBuffers(1, &uvbuffer);
-	glDisable(GL_TEXTURE_2D);
 }
+
+//void Renderer::drawTexturedTriangle(float x1, float y1, float x2, float y2, float x3, float y3, std::string textureName)
+//{
+//	//Tekstuuri temput ---------
+//	glEnable(GL_TEXTURE_2D);
+//	glUseProgram(textureProgramID);
+//	TextureID = glGetUniformLocation(textureProgramID, "myTextureSampler");
+//	GLuint texture = TM->getTexture(textureName);
+//	glActiveTexture(GL_TEXTURE0);
+//	glBindTexture(GL_TEXTURE_2D, texture);
+//	glUniform1i(TextureID, 0);
+//	//-----------------------------
+//
+//	static const GLfloat g_uv_buffer_data[] =
+//	{
+//		0.0, 0.0,
+//		1.0, 0.0,
+//		0.0, 1.0,
+//	};
+//
+//	glGenBuffers(1, &uvbuffer);
+//	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_DYNAMIC_DRAW);
+//
+//	GLuint vb, ib;
+//
+//	GLfloat g_vertex_buffer_data[] = {
+//		x1, y1, 1.0f,
+//		x2, y2, 1.0f,
+//		x3, y3, 1.0f,
+//	};
+//
+//	glGenBuffers(1, &vb);
+//	glBindBuffer(GL_ARRAY_BUFFER, vb);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
+//
+//	GLubyte g_indices[] =
+//	{
+//		0, 1, 2,
+//	};
+//	glGenBuffers(1, &ib);
+//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
+//	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(g_indices), g_indices, GL_DYNAMIC_DRAW);
+//
+//	glUniformMatrix4fv(MVP_MatrixID, 1, GL_FALSE, &MVP[0][0]);
+//
+//	glEnableVertexAttribArray(0);
+//	glVertexAttribPointer(
+//		0,                  // attribute 
+//		3,                  // size
+//		GL_FLOAT,           // type
+//		GL_FALSE,           // normalized?
+//		0,                  // stride
+//		(void*)0            // array buffer offset
+//		);
+//
+//	
+//	glEnableVertexAttribArray(1);
+//	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+//	glVertexAttribPointer(
+//		1,                  // attribute 1
+//		2,                  // size
+//		GL_FLOAT,           // type
+//		GL_FALSE,           // normalized?
+//		0,                  // stride
+//		(void*)0            // array buffer offset
+//		);
+//
+//
+//	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_BYTE, (GLvoid*)0);
+//	glDisableVertexAttribArray(0);
+//	glDisableVertexAttribArray(1);
+//
+//
+//	glDeleteBuffers(1, &vb);
+//	glDeleteBuffers(1, &ib);
+//	glDeleteBuffers(1, &uvbuffer);
+//	glDisable(GL_TEXTURE_2D);
+//}
 
 void Renderer::drawTexturedRectangle(float x1, float y1, float x2, float y2, std::string textureName)
 {
@@ -322,6 +541,8 @@ void Renderer::drawTexturedRectangle(float x1, float y1, float x2, float y2, std
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glUniform1i(TextureID, 0);
 	//-----------------------------
+
+	GLuint uvbuffer;
 
 	static const GLfloat g_uv_buffer_data[] =
 	{

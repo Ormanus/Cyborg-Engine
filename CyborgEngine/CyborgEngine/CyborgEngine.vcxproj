@@ -70,7 +70,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Circle.cpp" />
     <ClCompile Include="common\shader.cpp" />
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -78,7 +78,7 @@
     <ClCompile Include="TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.hpp" />
+    <ClInclude Include="Circle.h" />
     <ClInclude Include="common\shader.hpp" />
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Renderer.h" />

@@ -2,6 +2,7 @@
 #define GLM_FORCE_RADIANS
 
 #include "Renderer.h"
+#include "Circle.h"
 GLFWwindow* window;
 #include "Camera.hpp"
 int main()
@@ -61,21 +62,33 @@ int main()
 	p.setPoints(points, 8);
 	p.setOrigin(-0.5, 0.0);
 
+	Circle c;
+	c.setPrecision(8);
+
 	do{
-		a += 0.01;
+		a += 0.02;
 		//clear screen
 		Renderer::initDraw();
 		//draw
-		
+		Renderer::setColor((sin(a)+1)/10, 0, 0, 1);
+		Renderer::drawPolygon(&c, 0, 0);
+
+		c.setRotation(a);
+
+		//why does this set the drawing color???
+		//Renderer::drawTexturedTriangle(0.0, 0.0, 1.0, 1.0, -1.0, 0.0, "testi");
+
+		Renderer::setColor(0.0f, 0.0f, 0.0f, 1);
 		for (int i = 0; i < 8; i++)
 		{
-			Renderer::setColor(0, 1, (float)i/8, 1);
-			p.setRotation(a+i*3.14159265/4);
+			p.setRotation(a + i*3.14159265 / 4);
 			Renderer::drawPolygon(&p, 0, 0);
 		}
-		
-		Renderer::drawTexturedRectangle(0.5, 0.5, 0.3, 0.3, "default");
-		//Renderer::drawTexturedTriangle(1, 0.5, 0.2, 0, 0.3, -0.3, "aaa");
+		for (int i = 0; i < 8; i++)
+		{
+			p.setRotation(a+i*3.14159265/4);
+			Renderer::drawPolygonTextured(&p, -0.5f, 0, "testi");
+		}
 
 		//swap buffers
 		Renderer::render();

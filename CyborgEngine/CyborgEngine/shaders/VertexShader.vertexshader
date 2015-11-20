@@ -11,8 +11,11 @@ layout(location = VERTEX_COLOR) in vec3 vertexColor;
 // Output data ; will be interpolated for each fragment.
 out vec3 fragmentColor;
 
+uniform mat4 MVP;
+
 void main() {
 	gl_Position.xyz =  vertexPosition_modelspace;
 	gl_Position.w = 1.0;
+	gl_Position = MVP * gl_Position;
 	fragmentColor = vertexColor;
 }

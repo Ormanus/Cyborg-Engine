@@ -21,6 +21,7 @@ void TextureManager::loadTexture(std::string name, std::string filePath)
 	//ladataan kuva tiedostosta (PNG, BMP, JPG, TGA, DDS, PSD, HDR)
 	const char* c = filePath.c_str();
 	unsigned char* image = SOIL_load_image(c, &width, &height, 0, SOIL_LOAD_RGB);
+
 	if (image == NULL) // Error jos kuvan lataus epäonnistuu
 	{
 		std::cout << "Could not load image \"" + name + "\"\n" + SOIL_last_result();
@@ -34,7 +35,9 @@ void TextureManager::loadTexture(std::string name, std::string filePath)
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 	textures.insert(make_pair(name, texture));
+
 	//Vapautetaan kuva data muistista käytön jälkeen
+
 	SOIL_free_image_data(image);
 	std::cout << "Loaded texture: " << name << std::endl;
 }
@@ -45,7 +48,7 @@ void TextureManager::deleteTexture(std::string name)
 
 	if (i == textures.end())
 	{
-		std::cout << "Texture with this name does not exist." << std::endl;
+		std::cout << "Texture with this name doesn't exist." << std::endl;
 		return;
 	}
 

@@ -45,6 +45,7 @@ public:
 	void static drawCircle(float x, float y, float r);
 	void static drawPie(float x, float y, float r, float percentage);
 	void static drawPolygon(Polygon* p, const float x, const float y);
+	void static drawPolygonTextured(Polygon* p, const float x, const float y, std::string textureName);
 	void static drawMultiColorTriangle(float x1, float y1, float x2, float y2, float x3, float y3, int color1, int color2, int color3);
 	void static drawLine(float startPointX, float startPointY, float endPointX, float endPointY, float width);
 

@@ -25,9 +25,9 @@ private:
 	 std::vector<unsigned char> png;
 	 int width, height;
 
-	 void deleteTexture(std::string name);
 	 std::unordered_map<std::string, GLuint> textures;
-	 
+	 void deleteTexture(std::string name);
+
 };
 
 #endif
