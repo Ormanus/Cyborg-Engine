@@ -48,6 +48,7 @@ public:
 	void static drawPolygonTextured(Polygon* p, const float x, const float y, std::string textureName);
 	void static drawMultiColorTriangle(float x1, float y1, float x2, float y2, float x3, float y3, int color1, int color2, int color3);
 	void static drawLine(float startPointX, float startPointY, float endPointX, float endPointY, float width);
+	void static drawSprite(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, std::string textureName);
 
 	void static setColor(float r, float g, float b, float a);
 	void static setColor(int color);

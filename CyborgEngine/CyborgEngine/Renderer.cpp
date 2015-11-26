@@ -13,7 +13,7 @@ namespace {
 	glm::mat4 MVP(1.0);
 	GLuint MVP_MatrixID;
 	GLuint TextureID;
-	//GLuint uvbuffer;
+	GLuint uvbuffer;
 	GLuint colorbuffer;
 	GLuint Texture;
 	glm::mat4 VP;
@@ -675,6 +675,114 @@ void Renderer::drawLine(float startPointX, float startPointY, float endPointX, f
 	glDeleteBuffers(1, &bi);
 
 
+}
+void Renderer::drawSprite(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, std::string textureName)
+{
+	glDisable(GL_MULTISAMPLE);
+	//Tekstuuri temput ---------
+	glEnable(GL_TEXTURE_2D);
+	glUseProgram(textureProgramID);
+	TextureID = glGetUniformLocation(textureProgramID, "myTextureSampler");
+	GLuint texture = TM->getTexture(textureName);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glUniform1i(TextureID, 0);
+	static const GLfloat g_uv_buffer_data[] =
+	{
+		0.0, 0.0,
+		//rivit vinossa
+		1.0 / 6, 0.0,
+		//Rivit pysty suorassa
+		1.0 / 6, 1.0 / 5,
+		0.0, 1.0 / 5,
+	};
+	glGenBuffers(1, &uvbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_DYNAMIC_DRAW);
+	GLuint vb, ib;
+
+	GLfloat g_vertex_buffer_data[] = {
+		x1, y1, 1.0f,
+		x2, y2, 1.0f,
+		x3, y3, 1.0f,
+		x4, y4, 1.0f,
+	};
+
+	/*GLfloat g_vertex_buffer_data[] =
+	{
+	x1, y1,
+	x1 + 1, y1,
+	x1 + 1, y1 + 1,
+	x1, y1 + 1,
+	};*/
+	glGenBuffers(1, &vb);
+	glBindBuffer(GL_ARRAY_BUFFER, vb);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
+
+	GLubyte g_indices[] =
+	{
+		0, 1, 2,
+		0, 3, 2,
+	};
+	glGenBuffers(1, &ib);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(g_indices), g_indices, GL_DYNAMIC_DRAW);
+
+	glUniformMatrix4fv(MVP_MatrixID, 1, GL_FALSE, &MVP[0][0]);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(
+		0,                  // attribute 
+		3,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+		);
+
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glVertexAttribPointer(
+		1,                  // attribute 1
+		2,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+		);
+
+
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (GLvoid*)0);
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+
+
+	glDeleteBuffers(1, &vb);
+	glDeleteBuffers(1, &ib);
+	glDeleteBuffers(1, &uvbuffer);
+	glDisable(GL_TEXTURE_2D);
+
+	//GLfloat g_vertex_buffer_data[] =
+	//{
+	//	x1, y1,
+	//	x1 + 1, y1,
+	//	x1 + 1, y1 + 1,
+	//	x1, y1 + 1,
+	//};
+
+	//const float tw = float(1) / 1;
+	//const float th = float(spriteHeight) / texHeight;
+	//const int numPerRow = texWidth / spriteWidth;
+	//const float tx = (frameIndex % numPerRow) * tw;
+	//const float ty = (frameIndex / numPerRow + 1) * th;
+	//const float texVerts[] =
+	//{
+	//	tx, ty,
+	//	tx + tw, ty,
+	//	tx + tw, ty + th,
+	//	tx, ty + th
+	//};
 }
 void Renderer::setColor(float r, float g, float b, float a)
 {

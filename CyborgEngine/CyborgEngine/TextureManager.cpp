@@ -4,6 +4,8 @@ TextureManager::TextureManager()
 {
 	//Ladataan oletus tekstuuri kun texturemanager luodaan.
 	loadTexture("default", "./textures/default.png");
+	loadTexture("sprite", "./textures/spriteTest.bmp");
+	loadTexture("sheet", "./textures/spriteSheetTest.png");
 }
 
 TextureManager::~TextureManager()

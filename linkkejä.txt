@@ -1,3 +1,7 @@
 TextureManager (load, get, delete)
 http://gamedev.stackexchange.com/questions/59205/storing-texture-ids-for-fast-global-retrieval
 
+http://content.gpwiki.org/index.php/OpenGL:Tutorials:Tutorial_Framework:Texture_Mapping
+http://stackoverflow.com/questions/1568559/opengl-spritesheets-beginner-needs-some-guidance
+
+
