@@ -20,6 +20,7 @@ namespace {
 	glm::vec4 DefaultColor;
 	int N_shapes;
 	TextureManager* TM;
+	Sprite *SP;
 };
 
 void Renderer::FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
@@ -600,7 +601,7 @@ void Renderer::drawLine(float startPointX, float startPointY, float endPointX, f
 
 
 }
-void Renderer::drawSprite(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, std::string textureName)
+void Renderer::drawSprite(float posX, float posY, int rows, int colums, std::string textureName)
 {
 	glDisable(GL_MULTISAMPLE);
 	//Tekstuuri temput ---------
@@ -611,37 +612,34 @@ void Renderer::drawSprite(float x1, float y1, float x2, float y2, float x3, floa
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glUniform1i(TextureID, 0);
+	GLuint vb, ib;
+
+	float spriteWidth = SP->getSpriteWidth(rows);
+	float spriteHeight = SP->getSpriteHeight(colums);
+
+	//Spriteen neliö:
+	GLfloat g_vertex_buffer_data[] = {
+		posX, posY,
+		posX, posY + spriteHeight,
+		posX + spriteWidth, posY + spriteHeight,
+		posX + spriteWidth, posY,
+	};
+
+	glGenBuffers(1, &vb);
+	glBindBuffer(GL_ARRAY_BUFFER, vb);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
+
+
 	static const GLfloat g_uv_buffer_data[] =
 	{
 		0.0, 0.0,
-		//rivit vinossa
-		1.0 / 6, 0.0,
-		//Rivit pysty suorassa
-		1.0 / 6, 1.0 / 5,
-		0.0, 1.0 / 5,
+		0.5, 0.0,
+		0.5, 0.5,
+		0.0, 0.5,
 	};
 	glGenBuffers(1, &uvbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_DYNAMIC_DRAW);
-	GLuint vb, ib;
-
-	GLfloat g_vertex_buffer_data[] = {
-		x1, y1, 1.0f,
-		x2, y2, 1.0f,
-		x3, y3, 1.0f,
-		x4, y4, 1.0f,
-	};
-
-	/*GLfloat g_vertex_buffer_data[] =
-	{
-	x1, y1,
-	x1 + 1, y1,
-	x1 + 1, y1 + 1,
-	x1, y1 + 1,
-	};*/
-	glGenBuffers(1, &vb);
-	glBindBuffer(GL_ARRAY_BUFFER, vb);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
 
 	GLubyte g_indices[] =
 	{
@@ -716,13 +714,14 @@ void Renderer::setColor(float r, float g, float b, float a)
 	DefaultColor.a = a;
 
 	GLfloat g_color_buffer_data[] = {
-		DefaultColor.r, DefaultColor.g, DefaultColor.b, DefaultColor.a, 
+		DefaultColor.r, DefaultColor.g, DefaultColor.b, DefaultColor.a,
 		DefaultColor.r, DefaultColor.g, DefaultColor.b, DefaultColor.a,
 		DefaultColor.r, DefaultColor.g, DefaultColor.b, DefaultColor.a,
 	};
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
 }
+
 
 void Renderer::setColor(int color)
 {
