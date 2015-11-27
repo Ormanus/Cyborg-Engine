@@ -70,7 +70,7 @@ int main()
 		//clear screen
 		Renderer::initDraw();
 		//draw
-		Renderer::setColor((sin(a)+1)/10, 0, 0, 1);
+		Renderer::setColor(1.0, 0, 0, (sin(a) + 1) / 10);
 		Renderer::drawPolygon(&c, 0, 0);
 
 		c.setRotation(a);
@@ -87,7 +87,7 @@ int main()
 		for (int i = 0; i < 8; i++)
 		{
 			p.setRotation(a+i*3.14159265/4);
-			Renderer::drawPolygonTextured(&p, -0.5f, 0, "testi");
+			Renderer::drawPolygonTextured(&p, 0.5f*cos(a / 2), 0.5f*sin(a / 2), "testi");
 		}
 
 		//swap buffers

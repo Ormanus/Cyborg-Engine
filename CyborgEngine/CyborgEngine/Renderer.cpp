@@ -84,9 +84,9 @@ void Renderer::initRender(GLFWwindow* w)
 	//TODO: siirr‰ muualle myˆhemmin?
 
 	static const GLfloat g_color_buffer_data[] = {
-		DefaultColor.r, DefaultColor.g, DefaultColor.b,
-		DefaultColor.r, DefaultColor.g, DefaultColor.b,
-		DefaultColor.r, DefaultColor.g, DefaultColor.b,
+		DefaultColor.r, DefaultColor.g, DefaultColor.b, DefaultColor.a,
+		DefaultColor.r, DefaultColor.g, DefaultColor.b, DefaultColor.a,
+		DefaultColor.r, DefaultColor.g, DefaultColor.b, DefaultColor.a,
 	};
 
 	glGenBuffers(1, &colorbuffer);
@@ -97,8 +97,8 @@ void Renderer::initRender(GLFWwindow* w)
 	MVP_MatrixID = glGetUniformLocation(programID, "MVP");
 
 	//glEnable(jotain)
-	//glEnable(GL_BLEND);
-	//glBlendEquation(GL_ONE_MINUS_SRC_ALPHA);
+	glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 }
 
 void Renderer::uninitRender()
@@ -306,6 +306,8 @@ void Renderer::drawPolygonTextured(Polygon* p, const float x, const float y, std
 
 void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
 {
+	glEnable(GL_BLEND);
+
 	GLuint vb, ib;
 
 	GLfloat g_vertex_buffer_data[] = {
@@ -343,7 +345,7 @@ void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, fl
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glVertexAttribPointer(
 		1,                  // attribute 1
-		3,                  // size
+		4,                  // size
 		GL_FLOAT,           // type
 		GL_FALSE,           // normalized?
 		0,                  // stride
@@ -357,6 +359,8 @@ void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, fl
 
 	glDeleteBuffers(1, &vb);
 	glDeleteBuffers(1, &ib);
+
+	glDisable(GL_BLEND);
 }
 
 void Renderer::drawTexturedTriangle(float x1, float y1, float x2, float y2, float x3, float y3, std::string textureName)
@@ -451,85 +455,6 @@ void Renderer::drawTexturedTriangle(float x1, float y1, float x2, float y2, floa
 	glDeleteBuffers(1, &uvbuffer);
 }
 
-//void Renderer::drawTexturedTriangle(float x1, float y1, float x2, float y2, float x3, float y3, std::string textureName)
-//{
-//	//Tekstuuri temput ---------
-//	glEnable(GL_TEXTURE_2D);
-//	glUseProgram(textureProgramID);
-//	TextureID = glGetUniformLocation(textureProgramID, "myTextureSampler");
-//	GLuint texture = TM->getTexture(textureName);
-//	glActiveTexture(GL_TEXTURE0);
-//	glBindTexture(GL_TEXTURE_2D, texture);
-//	glUniform1i(TextureID, 0);
-//	//-----------------------------
-//
-//	static const GLfloat g_uv_buffer_data[] =
-//	{
-//		0.0, 0.0,
-//		1.0, 0.0,
-//		0.0, 1.0,
-//	};
-//
-//	glGenBuffers(1, &uvbuffer);
-//	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-//	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_DYNAMIC_DRAW);
-//
-//	GLuint vb, ib;
-//
-//	GLfloat g_vertex_buffer_data[] = {
-//		x1, y1, 1.0f,
-//		x2, y2, 1.0f,
-//		x3, y3, 1.0f,
-//	};
-//
-//	glGenBuffers(1, &vb);
-//	glBindBuffer(GL_ARRAY_BUFFER, vb);
-//	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
-//
-//	GLubyte g_indices[] =
-//	{
-//		0, 1, 2,
-//	};
-//	glGenBuffers(1, &ib);
-//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
-//	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(g_indices), g_indices, GL_DYNAMIC_DRAW);
-//
-//	glUniformMatrix4fv(MVP_MatrixID, 1, GL_FALSE, &MVP[0][0]);
-//
-//	glEnableVertexAttribArray(0);
-//	glVertexAttribPointer(
-//		0,                  // attribute 
-//		3,                  // size
-//		GL_FLOAT,           // type
-//		GL_FALSE,           // normalized?
-//		0,                  // stride
-//		(void*)0            // array buffer offset
-//		);
-//
-//	
-//	glEnableVertexAttribArray(1);
-//	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-//	glVertexAttribPointer(
-//		1,                  // attribute 1
-//		2,                  // size
-//		GL_FLOAT,           // type
-//		GL_FALSE,           // normalized?
-//		0,                  // stride
-//		(void*)0            // array buffer offset
-//		);
-//
-//
-//	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_BYTE, (GLvoid*)0);
-//	glDisableVertexAttribArray(0);
-//	glDisableVertexAttribArray(1);
-//
-//
-//	glDeleteBuffers(1, &vb);
-//	glDeleteBuffers(1, &ib);
-//	glDeleteBuffers(1, &uvbuffer);
-//	glDisable(GL_TEXTURE_2D);
-//}
-
 void Renderer::drawTexturedRectangle(float x1, float y1, float x2, float y2, std::string textureName)
 {
 	//Tekstuuri temput ---------
@@ -619,7 +544,6 @@ void Renderer::drawLine(float startPointX, float startPointY, float endPointX, f
 {
 	//Piirr‰ viiva:
 	//Onko t‰m‰ j‰rkev‰?????
-	//Korjasin yhden numeron, muuten n‰ytt‰‰ hyv‰lt‰  t. Olli
 
 	GLuint bv, bi;
 
@@ -792,9 +716,9 @@ void Renderer::setColor(float r, float g, float b, float a)
 	DefaultColor.a = a;
 
 	GLfloat g_color_buffer_data[] = {
-		DefaultColor.r, DefaultColor.g, DefaultColor.b,
-		DefaultColor.r, DefaultColor.g, DefaultColor.b,
-		DefaultColor.r, DefaultColor.g, DefaultColor.b,
+		DefaultColor.r, DefaultColor.g, DefaultColor.b, DefaultColor.a, 
+		DefaultColor.r, DefaultColor.g, DefaultColor.b, DefaultColor.a,
+		DefaultColor.r, DefaultColor.g, DefaultColor.b, DefaultColor.a,
 	};
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);

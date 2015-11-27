@@ -6,10 +6,10 @@
 
 // Input vertex data, different for all executions of this shader.
 layout(location = VERTEX_POSITION) in vec3 vertexPosition_modelspace;
-layout(location = VERTEX_COLOR) in vec3 vertexColor;
+layout(location = VERTEX_COLOR) in vec4 vertexColor;
 
 // Output data ; will be interpolated for each fragment.
-out vec3 fragmentColor;
+out vec4 fragmentColor;
 
 uniform mat4 MVP;
 
