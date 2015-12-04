@@ -5,6 +5,8 @@
 #include "Circle.h"
 GLFWwindow* window;
 #include "Camera.hpp"
+#include "Particle.h"
+
 int main()
 {
 
@@ -44,7 +46,7 @@ int main()
 
 	float a = 0;
 
-	
+	Particle part(0, 0, "part");
 
 	Polygon p;
 	glm::vec2 points[]
@@ -64,6 +66,8 @@ int main()
 
 	Circle c;
 	c.setPrecision(8);
+
+
 
 	do{
 		a += 0.02;
@@ -88,6 +92,12 @@ int main()
 		{
 			p.setRotation(a+i*3.14159265/4);
 			Renderer::drawPolygonTextured(&p, 0.5f*cos(a / 2), 0.5f*sin(a / 2), "testi");
+		}
+
+		float step = 3.14159265 / 100;
+		for (int i = 0; i < 100; i++)
+		{
+			Renderer::drawParticle(cos(i*step + a), sin(i*step + a), (i + 1) / 100, part);
 		}
 
 		//swap buffers

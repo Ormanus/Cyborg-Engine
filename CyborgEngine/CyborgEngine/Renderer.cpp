@@ -6,6 +6,7 @@
 namespace {
 	GLuint programID;
 	GLuint textureProgramID;
+	GLuint pointProgramID;
 	//GLuint vertexbuffer;
 	GLuint VertexArrayID;
 	//GLuint indexbuffer;
@@ -48,7 +49,7 @@ void Renderer::initDraw()
 	glm::mat4 V = glm::ortho(-1.0f, 1.0f, -1.0f*height / width, 1.0f*height / width);
 	VP = V*P;
 
-	glUseProgram(programID);
+	//glUseProgram(programID);
 	// ---------------------------
 }
 
@@ -74,11 +75,13 @@ void Renderer::initRender(GLFWwindow* w)
 
 	TM = new TextureManager;
 	TM->loadTexture("testi", "./textures/polygon.png");
+	TM->loadTexture("part", "./textures/particle.png");
 
 	//Ladataan shaderit
 	//valmiissa ohjelmassa bool setShaders() -funktio ajonaikaiseen shaderien vaihtoon?
 	programID = LoadShaders("shaders/VertexShader.vertexshader", "shaders/FragmentShader.fragmentshader");
 	textureProgramID = LoadShaders("shaders/TextureVertexShader.txt", "shaders/TextureFragmentShader.txt");
+	pointProgramID = LoadShaders("shaders/PointVertexShader.txt", "shaders/PointFragmentShader.txt");
 	//----------------
 
 	//luodaan väribufferi. 
@@ -307,6 +310,8 @@ void Renderer::drawPolygonTextured(Polygon* p, const float x, const float y, std
 
 void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
 {
+
+	glUseProgram(programID);
 	glEnable(GL_BLEND);
 
 	GLuint vb, ib;
@@ -546,6 +551,8 @@ void Renderer::drawLine(float startPointX, float startPointY, float endPointX, f
 	//Piirrä viiva:
 	//Onko tämä järkevä?????
 
+	glUseProgram(programID);
+
 	GLuint bv, bi;
 
 	GLfloat g_vertex_buffer_data[] = {
@@ -722,11 +729,50 @@ void Renderer::setColor(float r, float g, float b, float a)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
 }
 
-
 void Renderer::setColor(int color)
 {
 	float r = (float)((color >> 16) & 0xFF) / 255;
 	float g = (float)((color >> 8) & 0xFF) / 255;
 	float b = (float)((color >> 0) & 0xFF) / 255;
 	setColor(r, g, b, 1);
+}
+
+void Renderer::drawParticle(float x, float y, float scale, Particle p)
+{
+	glEnable(GL_BLEND);
+	glUseProgram(pointProgramID);
+	glBindTexture(GL_TEXTURE_2D, TM->getTexture(p.getTexture()));
+	glEnable(GL_POINT_SPRITE);
+	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	GLuint vb;
+	GLfloat g_vertex_buffer_data[] = {
+		0.5, -0.5,
+	};
+
+	glUniform1f(0, scale);
+	glUniform1f(1,  256);
+
+	glGenBuffers(1, &vb);
+	glBindBuffer(GL_ARRAY_BUFFER, vb);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
+
+	glVertexAttribPointer(
+		2,                  // attribute 1
+		2,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+		);
+
+	glDrawArrays(GL_POINTS, 0, 1);
+
+	glDeleteBuffers(1, &vb);
+	glDisable(GL_POINT_SPRITE);
+	glDisable(GL_BLEND);
 }
