@@ -70,15 +70,19 @@ int main()
 		//clear screen
 		Renderer::initDraw();
 		//draw
-		Renderer::setColor(1.0, 0, 0, (sin(a) + 1) / 10);
-		Renderer::drawPolygon(&c, 0, 0);
+		/*Renderer::setColor(1.0, 0, 0, (sin(a) + 1) / 10);
+		Renderer::drawPolygon(&c, 0, 0);*/
 
 		c.setRotation(a);
 
 		//why does this set the drawing color???
 		//Renderer::drawTexturedTriangle(0.0, 0.0, 1.0, 1.0, -1.0, 0.0, "testi");
 
-		Renderer::setColor(0.0f, 0.0f, 0.0f, 1);
+		//Renderer::drawTexturedRectangle(0.5,0.5,0.1,0.1,"Tahti");
+
+		Renderer::drawSingleSprite(-0.5,0.5, 0.25, 0.25,"Tahti");
+
+	/*	Renderer::setColor(0.0f, 0.0f, 0.0f, 1);
 		for (int i = 0; i < 8; i++)
 		{
 			p.setRotation(a + i*3.14159265 / 4);
@@ -88,7 +92,7 @@ int main()
 		{
 			p.setRotation(a+i*3.14159265/4);
 			Renderer::drawPolygonTextured(&p, 0.5f*cos(a / 2), 0.5f*sin(a / 2), "testi");
-		}
+		}*/
 
 		//swap buffers
 		Renderer::render();

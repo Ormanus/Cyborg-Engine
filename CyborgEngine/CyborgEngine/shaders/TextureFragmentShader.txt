@@ -7,9 +7,10 @@ uniform sampler2D myTextureSampler;
 //in bool gl_FrontFacing;
 //in vec2 gl_PointCoord;
 
-varying out vec3 color;
+varying out vec4 color;
 
 void main()
 {
-color = texture2D(myTextureSampler,UV).rgb;
+
+color = texture2D(myTextureSampler,UV).rgba;
 }

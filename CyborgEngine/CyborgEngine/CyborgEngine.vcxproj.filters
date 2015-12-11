@@ -57,4 +57,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="shaders\TextureFragmentShader.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="shaders\TextureVertexShader.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

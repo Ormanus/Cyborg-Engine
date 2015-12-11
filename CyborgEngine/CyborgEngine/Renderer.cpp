@@ -49,6 +49,7 @@ void Renderer::initDraw()
 	VP = V*P;
 
 	glUseProgram(programID);
+
 	// ---------------------------
 }
 
@@ -93,10 +94,10 @@ void Renderer::initRender(GLFWwindow* w)
 	glGenBuffers(1, &colorbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
-
+	glEnable(GL_BLEND);
 	//MVP näkyy shadereille
 	MVP_MatrixID = glGetUniformLocation(programID, "MVP");
-
+	
 	//glEnable(jotain)
 	glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
@@ -539,12 +540,11 @@ void Renderer::drawTexturedRectangle(float x1, float y1, float x2, float y2, std
 	glDeleteBuffers(1, &ib);
 	glDeleteBuffers(1, &uvbuffer);
 	glDisable(GL_TEXTURE_2D);
+
 }
 
 void Renderer::drawLine(float startPointX, float startPointY, float endPointX, float endPointY, float width)
 {
-	//Piirrä viiva:
-	//Onko tämä järkevä?????
 
 	GLuint bv, bi;
 
@@ -601,8 +601,9 @@ void Renderer::drawLine(float startPointX, float startPointY, float endPointX, f
 
 
 }
-void Renderer::drawSprite(float posX, float posY, int rows, int colums, std::string textureName)
+void Renderer::drawSingleSprite(float posX, float posY, float height, float width, std::string textureName)
 {
+	
 	glDisable(GL_MULTISAMPLE);
 	//Tekstuuri temput ---------
 	glEnable(GL_TEXTURE_2D);
@@ -612,39 +613,42 @@ void Renderer::drawSprite(float posX, float posY, int rows, int colums, std::str
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glUniform1i(TextureID, 0);
-	GLuint vb, ib;
-
-	float spriteWidth = SP->getSpriteWidth(rows);
-	float spriteHeight = SP->getSpriteHeight(colums);
-
-	//Spriteen neliö:
-	GLfloat g_vertex_buffer_data[] = {
-		posX, posY,
-		posX, posY + spriteHeight,
-		posX + spriteWidth, posY + spriteHeight,
-		posX + spriteWidth, posY,
-	};
-
-	glGenBuffers(1, &vb);
-	glBindBuffer(GL_ARRAY_BUFFER, vb);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
-
-
+	GLuint uvbuffer;
 	static const GLfloat g_uv_buffer_data[] =
 	{
 		0.0, 0.0,
-		0.5, 0.0,
-		0.5, 0.5,
-		0.0, 0.5,
+		0.0, 1.0,
+		1.0, 0.0,
+		1.0, 1.0,
+		
 	};
 	glGenBuffers(1, &uvbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_DYNAMIC_DRAW);
+	GLuint vb, ib;
+
+	/*float spriteWidth = SP->getSpriteWidth(rows);
+	float spriteHeight = SP->getSpriteHeight(colums);*/
+
+	//Spriteen neliö:
+	GLfloat g_vertex_buffer_data[] = 
+	{
+		posX, posY,1.0f,
+		posX, posY-height,1.0f,
+		posX+width, posY,1.0f,
+		posX+width, posY-height,1.0f,
+	};
+	
+	
+	glGenBuffers(1, &vb);
+	glBindBuffer(GL_ARRAY_BUFFER, vb);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
 
 	GLubyte g_indices[] =
 	{
 		0, 1, 2,
-		0, 3, 2,
+
+		1,3,2,
 	};
 	glGenBuffers(1, &ib);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
@@ -684,6 +688,7 @@ void Renderer::drawSprite(float posX, float posY, int rows, int colums, std::str
 	glDeleteBuffers(1, &ib);
 	glDeleteBuffers(1, &uvbuffer);
 	glDisable(GL_TEXTURE_2D);
+	
 
 	//GLfloat g_vertex_buffer_data[] =
 	//{
@@ -705,6 +710,10 @@ void Renderer::drawSprite(float posX, float posY, int rows, int colums, std::str
 	//	tx + tw, ty + th,
 	//	tx, ty + th
 	//};
+}
+void Renderer::drawSprite(float posX, float posY, float height, float width, int rows, int colums, std::string textureName)
+{
+
 }
 void Renderer::setColor(float r, float g, float b, float a)
 {
