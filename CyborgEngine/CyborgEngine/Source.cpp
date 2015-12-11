@@ -1,6 +1,8 @@
 #define GLEW_STATIC
 #define GLM_FORCE_RADIANS
 
+#define PI 3.14159265
+
 #include "Renderer.h"
 #include "Circle.h"
 GLFWwindow* window;
@@ -74,35 +76,33 @@ int main()
 		//clear screen
 		Renderer::initDraw();
 		//draw
-		/*Renderer::setColor(1.0, 0, 0, (sin(a) + 1) / 10);
-		Renderer::drawPolygon(&c, 0, 0);*/
+		Renderer::setColor(1.0, 0, 0, (sin(a) + 1) / 10);
+		Renderer::drawPolygon(&c, 0, 0);
 
 		c.setRotation(a);
 
-		//why does this set the drawing color???
-		//Renderer::drawTexturedTriangle(0.0, 0.0, 1.0, 1.0, -1.0, 0.0, "testi");
+		//Renderer::drawSingleSprite(-0.5,0.5, 0.25, 0.25,"Tahti");
 
-		//Renderer::drawTexturedRectangle(0.5,0.5,0.1,0.1,"Tahti");
-
-		Renderer::drawSingleSprite(-0.5,0.5, 0.25, 0.25,"Tahti");
-
-	/*	Renderer::setColor(0.0f, 0.0f, 0.0f, 1);
+		Renderer::setColor(0.0f, 0.0f, 0.0f, 1);
 		for (int i = 0; i < 8; i++)
 		{
 			p.setRotation(a + i*3.14159265 / 4);
 			Renderer::drawPolygon(&p, 0, 0);
 		}
-		for (int i = 0; i < 8; i++)
+		p.setOrigin(-0.5, 0.0);
+		for (int i = 0; i < 64; i++)
 		{
-			p.setRotation(a+i*3.14159265/4);
-			Renderer::drawPolygonTextured(&p, 0.5f*cos(a / 2), 0.5f*sin(a / 2), "testi");
-		}*/
+			p.setOrigin(-0.5 - (float)i / 256, 0.0);
+			p.setScale((float)(i+1)/16);
+			p.setRotation(a+i*3.14159265/8);
+			Renderer::drawPolygonTextured(&p, 0.0, 0.0, "testi");
+		}
 
 		int num = 64;
 		float step = 3.14159265*2 / num;
 		for (int i = 0; i < num; i++)
 		{
-			Renderer::drawPointSprite(cos((i*step + a)*2+3.14159265/2), sin(i*step + a), (float)(i + 1) / num, ps);
+			Renderer::drawPointSprite(cos((i*step + a)*2+PI/2), sin(i*step + a), (sin(step*i-a) / 2+0.51)/2, ps);
 		}
 
 		//swap buffers

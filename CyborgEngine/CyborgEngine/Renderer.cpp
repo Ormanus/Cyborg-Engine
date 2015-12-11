@@ -213,6 +213,8 @@ void Renderer::drawPolygonTextured(Polygon* p, const float x, const float y, std
 	glm::mat4 MVP_temp = MVP;
 	MVP = MVP * glm::translate(glm::vec3(x, y, 0));
 	MVP = MVP * glm::rotate(p->getRotation(), glm::vec3(0, 0, 1));
+	float scale = p->getScale();
+	MVP = MVP * glm::scale(glm::vec3(scale, scale, 1.0));
 	//MVP = MVP * glm::scale(glm::vec3(0.5f, 0.5f, 0.5f));
 
 	float width = p->getMax().x - p->getMin().x;
