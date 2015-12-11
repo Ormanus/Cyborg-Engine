@@ -22,6 +22,8 @@ namespace {
 	int N_shapes;
 	TextureManager* TM;
 	Sprite *SP;
+	GLuint scale_ID;
+	GLuint size_ID;
 };
 
 void Renderer::FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
@@ -97,8 +99,10 @@ void Renderer::initRender(GLFWwindow* w)
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
 
-	//MVP näkyy shadereille
+	//uniformit
 	MVP_MatrixID = glGetUniformLocation(programID, "MVP");
+	scale_ID = glGetUniformLocation(pointProgramID, "scale");
+	size_ID = glGetUniformLocation(pointProgramID, "point_size");
 
 	//glEnable(jotain)
 	glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
@@ -310,7 +314,6 @@ void Renderer::drawPolygonTextured(Polygon* p, const float x, const float y, std
 
 void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
 {
-
 	glUseProgram(programID);
 	glEnable(GL_BLEND);
 
@@ -737,33 +740,40 @@ void Renderer::setColor(int color)
 	setColor(r, g, b, 1);
 }
 
-void Renderer::drawParticle(float x, float y, float scale, Particle p)
+void Renderer::drawPointSprite(float x, float y, float scale, PointSprite p)
 {
+	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
-	glUseProgram(pointProgramID);
-	glBindTexture(GL_TEXTURE_2D, TM->getTexture(p.getTexture()));
 	glEnable(GL_POINT_SPRITE);
+	glEnable(GL_PROGRAM_POINT_SIZE);
+
+	glUseProgram(pointProgramID);
+
+	glBindTexture(GL_TEXTURE_2D, TM->getTexture(p.getTexture()));
+	
 	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
+	glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	GLuint vb;
-	GLfloat g_vertex_buffer_data[] = {
-		0.5, -0.5,
+	GLfloat vertexData[] = {
+		x, y, 0.0, 1.0,
 	};
-
-	glUniform1f(0, scale);
-	glUniform1f(1,  256);
-
 	glGenBuffers(1, &vb);
 	glBindBuffer(GL_ARRAY_BUFFER, vb);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_DYNAMIC_DRAW);
 
+	glUniform1f(scale_ID, scale);
+	glUniform1f(size_ID, 256);
+
+	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(
-		2,                  // attribute 1
-		2,                  // size
+		0,                  // attribute 0
+		4,                  // size x, y,
 		GL_FLOAT,           // type
 		GL_FALSE,           // normalized?
 		0,                  // stride
@@ -772,7 +782,10 @@ void Renderer::drawParticle(float x, float y, float scale, Particle p)
 
 	glDrawArrays(GL_POINTS, 0, 1);
 
+	glDisableVertexAttribArray(0);
 	glDeleteBuffers(1, &vb);
 	glDisable(GL_POINT_SPRITE);
 	glDisable(GL_BLEND);
+	glDisable(GL_TEXTURE_2D);
+	//MVP = MVP_temp;
 }

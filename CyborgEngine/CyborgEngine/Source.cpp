@@ -5,7 +5,7 @@
 #include "Circle.h"
 GLFWwindow* window;
 #include "Camera.hpp"
-#include "Particle.h"
+#include "PointSprite.h"
 
 int main()
 {
@@ -46,7 +46,7 @@ int main()
 
 	float a = 0;
 
-	Particle part(0, 0, "part");
+	PointSprite ps(0, 0, "part");
 
 	Polygon p;
 	glm::vec2 points[]
@@ -94,10 +94,11 @@ int main()
 			Renderer::drawPolygonTextured(&p, 0.5f*cos(a / 2), 0.5f*sin(a / 2), "testi");
 		}
 
-		float step = 3.14159265 / 100;
-		for (int i = 0; i < 100; i++)
+		int num = 64;
+		float step = 3.14159265*2 / num;
+		for (int i = 0; i < num; i++)
 		{
-			Renderer::drawParticle(cos(i*step + a), sin(i*step + a), (i + 1) / 100, part);
+			Renderer::drawPointSprite(cos((i*step + a)*2+3.14159265/2), sin(i*step + a), (float)(i + 1) / num, ps);
 		}
 
 		//swap buffers

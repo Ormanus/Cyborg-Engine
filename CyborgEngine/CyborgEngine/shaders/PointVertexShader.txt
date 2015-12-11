@@ -1,15 +1,12 @@
 #version 120
 
-uniform float scale;
 uniform float point_size;
+uniform float scale;
 
-in vec2 vertexPosition;
-
-//varying out vec4 f_color;
+in vec4 vertexPosition;
 
 void main()
 {
-	gl_Position = vec4((vertexPosition.x), vertexPosition.y, 0, 1);
-	//f_color = vec4(vertexPosition.xy, 1, 1);
-	gl_PointSize = point_size;
+	gl_Position = vertexPosition;
+	gl_PointSize = point_size * scale;
 }
