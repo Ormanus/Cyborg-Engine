@@ -5,6 +5,8 @@
 #include "Circle.h"
 GLFWwindow* window;
 #include "Camera.hpp"
+#include "PointSprite.h"
+
 int main()
 {
 
@@ -44,7 +46,7 @@ int main()
 
 	float a = 0;
 
-	
+	PointSprite ps(0, 0, "part");
 
 	Polygon p;
 	glm::vec2 points[]
@@ -64,6 +66,8 @@ int main()
 
 	Circle c;
 	c.setPrecision(8);
+
+
 
 	do{
 		a += 0.02;
@@ -93,6 +97,13 @@ int main()
 			p.setRotation(a+i*3.14159265/4);
 			Renderer::drawPolygonTextured(&p, 0.5f*cos(a / 2), 0.5f*sin(a / 2), "testi");
 		}*/
+
+		int num = 64;
+		float step = 3.14159265*2 / num;
+		for (int i = 0; i < num; i++)
+		{
+			Renderer::drawPointSprite(cos((i*step + a)*2+3.14159265/2), sin(i*step + a), (float)(i + 1) / num, ps);
+		}
 
 		//swap buffers
 		Renderer::render();

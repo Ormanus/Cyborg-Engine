@@ -13,6 +13,7 @@
 #include "Polygon.h"
 #include "TextureManager.h"
 #include "Sprite.h"
+#include "PointSprite.h"
 class Renderer
 {
 public:
@@ -51,6 +52,8 @@ public:
 
 	void static drawSingleSprite(float posX, float posY, float height, float width,std::string textureName);
 	void static drawSprite(float posX, float posY, float height, float width,int rows, int colums, std::string textureName);
+
+	void static drawPointSprite(float x, float y, float scale, PointSprite p);
 
 	void static setColor(float r, float g, float b, float a);
 	void static setColor(int color);

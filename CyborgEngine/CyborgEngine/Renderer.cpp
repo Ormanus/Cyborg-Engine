@@ -6,6 +6,7 @@
 namespace {
 	GLuint programID;
 	GLuint textureProgramID;
+	GLuint pointProgramID;
 	//GLuint vertexbuffer;
 	GLuint VertexArrayID;
 	//GLuint indexbuffer;
@@ -21,6 +22,8 @@ namespace {
 	int N_shapes;
 	TextureManager* TM;
 	Sprite *SP;
+	GLuint scale_ID;
+	GLuint size_ID;
 };
 
 void Renderer::FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
@@ -48,9 +51,7 @@ void Renderer::initDraw()
 	glm::mat4 V = glm::ortho(-1.0f, 1.0f, -1.0f*height / width, 1.0f*height / width);
 	VP = V*P;
 
-	glUseProgram(programID);
-
-	// ---------------------------
+	//glUseProgram(programID);
 }
 
 
@@ -75,11 +76,13 @@ void Renderer::initRender(GLFWwindow* w)
 
 	TM = new TextureManager;
 	TM->loadTexture("testi", "./textures/polygon.png");
+	TM->loadTexture("part", "./textures/particle.png");
 
 	//Ladataan shaderit
 	//valmiissa ohjelmassa bool setShaders() -funktio ajonaikaiseen shaderien vaihtoon?
 	programID = LoadShaders("shaders/VertexShader.vertexshader", "shaders/FragmentShader.fragmentshader");
 	textureProgramID = LoadShaders("shaders/TextureVertexShader.txt", "shaders/TextureFragmentShader.txt");
+	pointProgramID = LoadShaders("shaders/PointVertexShader.txt", "shaders/PointFragmentShader.txt");
 	//----------------
 
 	//luodaan väribufferi. 
@@ -94,10 +97,12 @@ void Renderer::initRender(GLFWwindow* w)
 	glGenBuffers(1, &colorbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
-	glEnable(GL_BLEND);
-	//MVP näkyy shadereille
+
+	//uniformit
 	MVP_MatrixID = glGetUniformLocation(programID, "MVP");
-	
+	scale_ID = glGetUniformLocation(pointProgramID, "scale");
+	size_ID = glGetUniformLocation(pointProgramID, "point_size");
+
 	//glEnable(jotain)
 	glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
@@ -308,6 +313,7 @@ void Renderer::drawPolygonTextured(Polygon* p, const float x, const float y, std
 
 void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3)
 {
+	glUseProgram(programID);
 	glEnable(GL_BLEND);
 
 	GLuint vb, ib;
@@ -546,6 +552,8 @@ void Renderer::drawTexturedRectangle(float x1, float y1, float x2, float y2, std
 void Renderer::drawLine(float startPointX, float startPointY, float endPointX, float endPointY, float width)
 {
 
+	glUseProgram(programID);
+
 	GLuint bv, bi;
 
 	GLfloat g_vertex_buffer_data[] = {
@@ -731,11 +739,60 @@ void Renderer::setColor(float r, float g, float b, float a)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
 }
 
-
 void Renderer::setColor(int color)
 {
 	float r = (float)((color >> 16) & 0xFF) / 255;
 	float g = (float)((color >> 8) & 0xFF) / 255;
 	float b = (float)((color >> 0) & 0xFF) / 255;
 	setColor(r, g, b, 1);
+}
+
+void Renderer::drawPointSprite(float x, float y, float scale, PointSprite p)
+{
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glEnable(GL_POINT_SPRITE);
+	glEnable(GL_PROGRAM_POINT_SIZE);
+
+	glUseProgram(pointProgramID);
+
+	glBindTexture(GL_TEXTURE_2D, TM->getTexture(p.getTexture()));
+	
+	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
+	glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	GLuint vb;
+	GLfloat vertexData[] = {
+		x, y, 0.0, 1.0,
+	};
+	glGenBuffers(1, &vb);
+	glBindBuffer(GL_ARRAY_BUFFER, vb);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_DYNAMIC_DRAW);
+
+	glUniform1f(scale_ID, scale);
+	glUniform1f(size_ID, 256);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(
+		0,                  // attribute 0
+		4,                  // size x, y,
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+		);
+
+	glDrawArrays(GL_POINTS, 0, 1);
+
+	glDisableVertexAttribArray(0);
+	glDeleteBuffers(1, &vb);
+	glDisable(GL_POINT_SPRITE);
+	glDisable(GL_BLEND);
+	glDisable(GL_TEXTURE_2D);
+	//MVP = MVP_temp;
 }
