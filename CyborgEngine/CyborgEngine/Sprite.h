@@ -19,8 +19,8 @@ public:
 	Sprite(int tW, int tH, int sW, int sH);
 	~Sprite();
 
-	float getSpriteWidth(int rows){ return  1.0 / rows; }
-	float getSpriteHeight(int columns){ return 1.0 / columns; }
+	float getSpriteWidth(float a){ return  (1.0 / a); }
+	float getSpriteHeight(float b){ return (1.0 / b); }
 
 };
 
