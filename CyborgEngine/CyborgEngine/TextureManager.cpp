@@ -1,22 +1,5 @@
 #include "TextureManager.h"
 
-TextureManager::TextureManager()
-{
-	//Ladataan oletus tekstuuri kun texturemanager luodaan.
-	loadTexture("default", "./textures/default.png");
-	loadTexture("sprite", "./textures/spriteTest.bmp");
-	loadTexture("sheet", "./textures/spriteSheetTest.png");
-	loadTexture("Apina","./textures/apina.png");
-	loadTexture("Tahti", "./textures/tahti.png");
-}
-
-TextureManager::~TextureManager()
-{
-	// Tyhjennet‰‰n textures array.
-	//glDeleteTextures(textures.size(), textures);
-	textures.clear();
-}
-
 void TextureManager::loadTexture(std::string name, std::string filePath)
 {
 	GLuint texture;

@@ -46,6 +46,12 @@ int main()
 
 	Renderer::initRender(window);
 
+	//load resources:
+	TextureManager* TM = TextureManager::getInstance();
+
+	TM->loadTexture("testi", "./textures/polygon.png");
+	TM->loadTexture("part", "./textures/particle.png");
+
 	float a = 0;
 
 	PointSprite ps(0, 0, "part");

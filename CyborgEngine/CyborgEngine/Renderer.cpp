@@ -74,9 +74,7 @@ void Renderer::initRender(GLFWwindow* w)
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
-	TM = new TextureManager;
-	TM->loadTexture("testi", "./textures/polygon.png");
-	TM->loadTexture("part", "./textures/particle.png");
+	TM = TextureManager::getInstance();
 
 	//Ladataan shaderit
 	//valmiissa ohjelmassa bool setShaders() -funktio ajonaikaiseen shaderien vaihtoon?
