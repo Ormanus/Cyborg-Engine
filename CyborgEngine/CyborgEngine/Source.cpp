@@ -53,15 +53,15 @@ int main()
 	Polygon p;
 	glm::vec2 points[]
 	{
-		
+
 		glm::vec2(0.0, 0.21),
-		glm::vec2(0.05, 0.05),
-		glm::vec2(0.4, 0.0),
-		glm::vec2(0.05, -0.05),
-		glm::vec2(0.0, -0.21),
-		glm::vec2(-0.05, -0.05),
-		glm::vec2(-0.4, 0.0),
-		glm::vec2(-0.05, 0.05),
+			glm::vec2(0.05, 0.05),
+			glm::vec2(0.4, 0.0),
+			glm::vec2(0.05, -0.05),
+			glm::vec2(0.0, -0.21),
+			glm::vec2(-0.05, -0.05),
+			glm::vec2(-0.4, 0.0),
+			glm::vec2(-0.05, 0.05),
 	};
 	p.setPoints(points, 8);
 	p.setOrigin(-0.5, 0.0);
@@ -81,9 +81,8 @@ int main()
 
 		c.setRotation(a);
 
-		//Renderer::drawSingleSprite(-0.5,0.5, 0.25, 0.25,"Tahti");
-
 		Renderer::setColor(0.0f, 0.0f, 0.0f, 1);
+
 		for (int i = 0; i < 8; i++)
 		{
 			p.setRotation(a + i*3.14159265 / 4);
@@ -93,16 +92,16 @@ int main()
 		for (int i = 0; i < 64; i++)
 		{
 			p.setOrigin(-0.5 - (float)i / 256, 0.0);
-			p.setScale((float)(i+1)/16);
-			p.setRotation(a+i*3.14159265/8);
+			p.setScale((float)(i + 1) / 16);
+			p.setRotation(a + i*3.14159265 / 8);
 			Renderer::drawPolygonTextured(&p, 0.0, 0.0, "testi");
 		}
 
 		int num = 64;
-		float step = 3.14159265*2 / num;
+		float step = 3.14159265 * 2 / num;
 		for (int i = 0; i < num; i++)
 		{
-			Renderer::drawPointSprite(cos((i*step + a)*2+PI/2), sin(i*step + a), (sin(step*i-a) / 2+0.51)/2, ps);
+			Renderer::drawPointSprite(cos((i*step + a) * 2 + PI / 2), sin(i*step + a), (sin(step*i - a) / 2.2 + 0.51) / 2, ps);
 		}
 
 		//swap buffers

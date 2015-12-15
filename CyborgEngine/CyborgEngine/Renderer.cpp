@@ -104,6 +104,8 @@ void Renderer::initRender(GLFWwindow* w)
 	size_ID = glGetUniformLocation(pointProgramID, "point_size");
 
 	//glEnable(jotain)
+
+	glEnable(GL_BLEND);
 	glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 }
@@ -699,7 +701,7 @@ void Renderer::drawSingleSprite(float posX, float posY, float height, float widt
 	glDeleteBuffers(1, &uvbuffer);
 	glDisable(GL_TEXTURE_2D);
 	
-
+	
 	//GLfloat g_vertex_buffer_data[] =
 	//{
 	//	x1, y1,
@@ -721,9 +723,98 @@ void Renderer::drawSingleSprite(float posX, float posY, float height, float widt
 	//	tx, ty + th
 	//};
 }
-void Renderer::drawSprite(float posX, float posY, float height, float width, int rows, int colums, std::string textureName)
+void Renderer::drawSprite(float posX, float posY, float height, float width, float spriteRows, float spriteColums, float dSpriteX, float dSpriteY, std::string textureName)
 {
+	glDisable(GL_MULTISAMPLE);
+	//Tekstuuri temput ---------
+	glEnable(GL_TEXTURE_2D);
+	glUseProgram(textureProgramID);
+	TextureID = glGetUniformLocation(textureProgramID, "myTextureSampler");
+	GLuint texture = TM->getTexture(textureName);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glUniform1i(TextureID, 0);
+	float spriteHeight = SP->getSpriteHeight(spriteColums);
+	float spriteWidth = SP->getSpriteWidth(spriteRows);
 
+	/*std::cout << spriteHeight<<std::endl;
+	std::cout << spriteWidth << std::endl;*/
+	std::cout << spriteWidth;
+	GLuint uvbuffer;
+	static const GLfloat g_uv_buffer_data[] =
+	{
+		dSpriteX*spriteWidth, 0.0,
+		dSpriteX*spriteWidth, spriteHeight*dSpriteY,
+		spriteWidth + (dSpriteX*spriteWidth), 0.0,
+		spriteWidth+(dSpriteX*spriteWidth), spriteHeight*dSpriteY,
+
+	};
+	glGenBuffers(1, &uvbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_DYNAMIC_DRAW);
+	GLuint vb, ib;
+
+	/*float spriteWidth = SP->getSpriteWidth(rows);
+	float spriteHeight = SP->getSpriteHeight(colums);*/
+
+	//Spriteen neliö:
+	GLfloat g_vertex_buffer_data[] =
+	{
+		posX, posY, 1.0f,
+		posX, posY - height, 1.0f,
+		posX + width, posY, 1.0f,
+		posX + width, posY - height, 1.0f,
+	};
+
+
+	glGenBuffers(1, &vb);
+	glBindBuffer(GL_ARRAY_BUFFER, vb);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
+
+	GLubyte g_indices[] =
+	{
+		0, 1, 2,
+
+		1, 3, 2,
+	};
+	glGenBuffers(1, &ib);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(g_indices), g_indices, GL_DYNAMIC_DRAW);
+
+	glUniformMatrix4fv(MVP_MatrixID, 1, GL_FALSE, &MVP[0][0]);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(
+		0,                  // attribute 
+		3,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+		);
+
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glVertexAttribPointer(
+		1,                  // attribute 1
+		2,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+		);
+
+
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (GLvoid*)0);
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+
+
+	glDeleteBuffers(1, &vb);
+	glDeleteBuffers(1, &ib);
+	glDeleteBuffers(1, &uvbuffer);
+	glDisable(GL_TEXTURE_2D);
 }
 void Renderer::setColor(float r, float g, float b, float a)
 {
