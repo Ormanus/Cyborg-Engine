@@ -7,7 +7,8 @@
 #include "Circle.h"
 GLFWwindow* window;
 #include "Camera.hpp"
-#include "PointSprite.h"
+//#include "PointSprite.h"
+#include "ParticleSystem.h"
 
 int main()
 {
@@ -75,7 +76,7 @@ int main()
 	Circle c;
 	c.setPrecision(8);
 
-
+	ParticleSystem sys;
 
 	do{
 		a += 0.02;
@@ -107,8 +108,10 @@ int main()
 		float step = 3.14159265 * 2 / num;
 		for (int i = 0; i < num; i++)
 		{
-			Renderer::drawPointSprite(cos((i*step + a) * 2 + PI / 2), sin(i*step + a), (sin(step*i - a) / 2.2 + 0.51) / 2, ps);
+			Renderer::drawPointSprite(cos((i*step + a) * 2 + PI / 2), sin(i*step + a), (sin(step*i - a) / 2.2 + 0.51) / 2, &ps);
 		}
+
+		sys.update(10.0f / 60.0f);
 
 		//swap buffers
 		Renderer::render();

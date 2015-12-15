@@ -72,6 +72,7 @@
   <ItemGroup>
     <ClCompile Include="Circle.cpp" />
     <ClCompile Include="common\shader.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="PointSprite.cpp" />
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -82,6 +83,7 @@
   <ItemGroup>
     <ClInclude Include="Circle.h" />
     <ClInclude Include="common\shader.hpp" />
+    <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="PointSprite.h" />
     <ClInclude Include="Polygon.h" />
     <ClInclude Include="Renderer.h" />

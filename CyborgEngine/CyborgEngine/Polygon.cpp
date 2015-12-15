@@ -10,7 +10,7 @@ Polygon::Polygon()
 
 Polygon::~Polygon()
 {
-	//how do I not leak memory?
+	std::cout << "Polygon killed.\n";
 }
 
 void Polygon::setPoints(glm::vec2* p, int size)

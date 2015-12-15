@@ -54,8 +54,8 @@ public:
 	//void static drawSprite(float posX, float posY, float height, float width,int rows, int colums, std::string textureName);
 	void static drawSprite(float posX, float posY, float height, float width, float spriteRows, float spriteColums, float dSpriteX, float dSpriteY, std::string textureName);
 
-
-	void static drawPointSprite(float x, float y, float scale, PointSprite p);
+	void static drawPointSprite(float scale, PointSprite* p);
+	void static drawPointSprite(float x, float y, float scale, PointSprite* p);
 
 	void static setColor(float r, float g, float b, float a);
 	void static setColor(int color);

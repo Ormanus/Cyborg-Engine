@@ -838,7 +838,7 @@ void Renderer::setColor(int color)
 	setColor(r, g, b, 1);
 }
 
-void Renderer::drawPointSprite(float x, float y, float scale, PointSprite p)
+void Renderer::drawPointSprite(float x, float y, float scale, PointSprite* p)
 {
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
@@ -847,7 +847,7 @@ void Renderer::drawPointSprite(float x, float y, float scale, PointSprite p)
 
 	glUseProgram(pointProgramID);
 
-	glBindTexture(GL_TEXTURE_2D, TM->getTexture(p.getTexture()));
+	glBindTexture(GL_TEXTURE_2D, TM->getTexture(p->getTexture()));
 	
 	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -860,6 +860,56 @@ void Renderer::drawPointSprite(float x, float y, float scale, PointSprite p)
 	GLuint vb;
 	GLfloat vertexData[] = {
 		x, y, 0.0, 1.0,
+	};
+	glGenBuffers(1, &vb);
+	glBindBuffer(GL_ARRAY_BUFFER, vb);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_DYNAMIC_DRAW);
+
+	glUniform1f(scale_ID, scale);
+	glUniform1f(size_ID, 256);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(
+		0,                  // attribute 0
+		4,                  // size x, y,
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+		);
+
+	glDrawArrays(GL_POINTS, 0, 1);
+
+	glDisableVertexAttribArray(0);
+	glDeleteBuffers(1, &vb);
+	glDisable(GL_POINT_SPRITE);
+	glDisable(GL_BLEND);
+	glDisable(GL_TEXTURE_2D);
+	//MVP = MVP_temp;
+}
+
+void Renderer::drawPointSprite(float scale, PointSprite* p)
+{
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glEnable(GL_POINT_SPRITE);
+	glEnable(GL_PROGRAM_POINT_SIZE);
+
+	glUseProgram(pointProgramID);
+
+	glBindTexture(GL_TEXTURE_2D, TM->getTexture(p->getTexture()));
+
+	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
+	glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	GLuint vb;
+	GLfloat vertexData[] = {
+		p->getX(), p->getY(), 0.0, 1.0,
 	};
 	glGenBuffers(1, &vb);
 	glBindBuffer(GL_ARRAY_BUFFER, vb);
