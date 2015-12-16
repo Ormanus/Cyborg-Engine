@@ -104,6 +104,7 @@ void Renderer::initRender(GLFWwindow* w)
 	//glEnable(jotain)
 
 	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 }
@@ -700,9 +701,10 @@ void Renderer::drawSingleSprite(float posX, float posY, float height, float widt
 	glDisable(GL_TEXTURE_2D);
 	
 }
-void Renderer::drawSprite(float posX, float posY, float height, float width, float spriteRows, float spriteColums, float dSpriteX, float dSpriteY, std::string textureName)
+void Renderer::drawSprite(float posX, float posY, float height, float width, float spriteWidth, float spriteHeight, std::string textureName)
 {
 	glDisable(GL_MULTISAMPLE);
+	
 	//Tekstuuri temput ---------
 	glEnable(GL_TEXTURE_2D);
 	glUseProgram(textureProgramID);
@@ -711,19 +713,14 @@ void Renderer::drawSprite(float posX, float posY, float height, float width, flo
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glUniform1i(TextureID, 0);
-	float spriteHeight = SP->getSpriteHeight(spriteColums);
-	float spriteWidth = SP->getSpriteWidth(spriteRows);
-
-	/*std::cout << spriteHeight<<std::endl;
-	std::cout << spriteWidth << std::endl;*/
-	std::cout << spriteWidth;
+	
 	GLuint uvbuffer;
 	static const GLfloat g_uv_buffer_data[] =
 	{
-		dSpriteX*spriteWidth, 0.0,
-		dSpriteX*spriteWidth, spriteHeight*dSpriteY,
-		spriteWidth + (dSpriteX*spriteWidth), 0.0,
-		spriteWidth+(dSpriteX*spriteWidth), spriteHeight*dSpriteY,
+		spriteWidth,spriteHeight,
+		spriteWidth,spriteHeight+height,
+		spriteWidth+width,spriteHeight,
+		spriteWidth+width,spriteHeight+height,
 
 	};
 	glGenBuffers(1, &uvbuffer);
@@ -751,7 +748,6 @@ void Renderer::drawSprite(float posX, float posY, float height, float width, flo
 	GLubyte g_indices[] =
 	{
 		0, 1, 2,
-
 		1, 3, 2,
 	};
 	glGenBuffers(1, &ib);

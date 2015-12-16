@@ -14,20 +14,26 @@ class Sprite
 
 public:
 
-	Sprite(float r, float c, std::string t);
+	Sprite();
 	~Sprite();
 
-	float getSpriteWidth(float a){ return  (1.0 / a); }
-	float getSpriteHeight(float b){ return (1.0 / b); }
-	std::string getTexture(){ return texture; }
-	void setSprite(float rows, float columns);
+
+	void setRows(int c){ rows = c; }
+	void setColumns(int d){ columns = d;}
+	void setSprite();
+
+	int getRows(){ return rows; }
+	int getColumns(){ return columns; }
+	float getSpriteWidth(){ return  (1.0 / rows); }
+	float getSpriteHeight(){ return (1.0 / columns); }
 	glm::vec2 getSprite(int a);
 
-	float rows, columns;
+
+	private:
+	int rows, columns;
 	std::string texture;
 	std::unordered_map<int, glm::vec2> coordinates;
-	float getSpriteWidth(int rows){ return  1.0 / rows; }
-	float getSpriteHeight(int columns){ return 1.0 / columns; }
+	
 
 
 };

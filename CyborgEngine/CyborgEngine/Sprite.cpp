@@ -1,16 +1,12 @@
 #include "Sprite.h"
 
-namespace
-{
-	Sprite*SP;
-};
 
-Sprite::Sprite(float r, float c, std::string t)
+
+Sprite::Sprite()
 {
-	rows = r;
-	columns = c;
-	texture = t;
-	setSprite(rows, columns);
+	rows = 0;
+	columns = 0;
+	setSprite();
 }
 
 
@@ -19,24 +15,20 @@ Sprite::~Sprite()
 	coordinates.clear();
 }
 
-void Sprite::setSprite(float rows, float columns)
+void Sprite::setSprite()
 {
 
-	float spriteW = SP->getSpriteWidth(rows);
-	float spriteH = SP->getSpriteHeight(columns);
-	std::cout << spriteW << ", " << spriteH << std::endl;
-	int numberPerRow = 1 / spriteW;
+	float spriteW = getSpriteWidth();
+	float spriteH = getSpriteHeight();
 	int size = rows*columns;
-	std::cout << numberPerRow << std::endl;
-
+	/*std::cout << numberPerRow << std::endl;*/
 	for (int i = 1; i < size; i++)
 	{
-		float tX = (i%numberPerRow)*spriteW;
-		float tY = (i / numberPerRow + 1)*spriteH;
+		float tX = (i%rows)*spriteW;
+		float tY = (i / rows + 1)*spriteH;
 		glm::vec2 spriteCoords = { tX, tY };
 		coordinates.insert(std::make_pair(i, spriteCoords));
 	}
-
 }
 glm::vec2 Sprite::getSprite(int a)
 {

@@ -51,8 +51,8 @@ public:
 	void static drawLine(float startPointX, float startPointY, float endPointX, float endPointY, float width);
 
 	void static drawSingleSprite(float posX, float posY, float height, float width,std::string textureName);
-	//void static drawSprite(float posX, float posY, float height, float width,int rows, int colums, std::string textureName);
-	void static drawSprite(float posX, float posY, float height, float width, float spriteRows, float spriteColums, float dSpriteX, float dSpriteY, std::string textureName);
+
+	void static drawSprite(float posX, float posY, float height, float width, float spriteWidth , float spriteHeight,std::string textureName);
 
 
 	void static drawPointSprite(float x, float y, float scale, PointSprite p);
