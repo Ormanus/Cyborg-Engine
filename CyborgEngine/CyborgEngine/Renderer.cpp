@@ -699,27 +699,6 @@ void Renderer::drawSingleSprite(float posX, float posY, float height, float widt
 	glDeleteBuffers(1, &uvbuffer);
 	glDisable(GL_TEXTURE_2D);
 	
-	
-	//GLfloat g_vertex_buffer_data[] =
-	//{
-	//	x1, y1,
-	//	x1 + 1, y1,
-	//	x1 + 1, y1 + 1,
-	//	x1, y1 + 1,
-	//};
-
-	//const float tw = float(1) / 1;
-	//const float th = float(spriteHeight) / texHeight;
-	//const int numPerRow = texWidth / spriteWidth;
-	//const float tx = (frameIndex % numPerRow) * tw;
-	//const float ty = (frameIndex / numPerRow + 1) * th;
-	//const float texVerts[] =
-	//{
-	//	tx, ty,
-	//	tx + tw, ty,
-	//	tx + tw, ty + th,
-	//	tx, ty + th
-	//};
 }
 void Renderer::drawSprite(float posX, float posY, float height, float width, float spriteRows, float spriteColums, float dSpriteX, float dSpriteY, std::string textureName)
 {
