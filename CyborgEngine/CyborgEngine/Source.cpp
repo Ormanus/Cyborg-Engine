@@ -6,7 +6,6 @@
 #include "Renderer.h"
 #include "Circle.h"
 GLFWwindow* window;
-#include "Camera.hpp"
 #include "PointSprite.h"
 #include "Sprite.h"
 
@@ -36,6 +35,7 @@ int main()
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, Renderer::FramebufferSizeCallback);
+	glfwSetKeyCallback(window, Renderer::key_callback);
 	Renderer::FramebufferSizeCallback(window, w, h);
 	glewExperimental = true; // Needed for core profile
 	if (glewInit() != GLEW_OK) {
@@ -92,6 +92,7 @@ int main()
 	int scene = 0;
 
 	do{
+		Renderer::do_movement();
 		if (isEnterPressed == false)
 		{
 			if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)

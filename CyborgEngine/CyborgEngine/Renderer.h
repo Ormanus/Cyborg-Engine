@@ -50,6 +50,10 @@ public:
 	void static drawMultiColorTriangle(float x1, float y1, float x2, float y2, float x3, float y3, int color1, int color2, int color3);
 	void static drawLine(float startPointX, float startPointY, float endPointX, float endPointY, float width);
 
+	void static key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+	void static do_movement();
+	glm::mat4 static getMVP();
+
 	void static drawSingleSprite(float posX, float posY, float height, float width,std::string textureName);
 
 	void static drawSprite(Sprite *SP,float posX, float posY, float spriteWidth , float spriteHeight,std::string textureName, float alpha = 1.0);

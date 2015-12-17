@@ -29,6 +29,14 @@ namespace {
 	GLuint size_ID;
 	GLuint line_color_ID;
 	//GLuint line_MVP_ID;
+	glm::vec3 x_axis(1.0, 0.0, 0.0);
+	glm::vec3 y_axis(0.0, 1.0, 0.0);
+	glm::vec3 z_axis(0.0, 0.0, 1.0);
+	glm::vec3 cam_pos(0, 0, 0);
+	glm::vec3 cam_up = y_axis;
+	glm::vec3 cam_right = x_axis;
+	glm::vec3 cam_front = -z_axis; //oikeakatinen koordinaatisto
+	bool keys[1024];
 };
 
 void Renderer::FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
@@ -40,22 +48,22 @@ void Renderer::initDraw()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Tyhjennetään ruutu
 	// Koordinaatisto / Viewport
-	glm::vec3 x_axis(1.0, 0.0, 0.0);
-	glm::vec3 y_axis(0.0, 1.0, 0.0);
-	glm::vec3 z_axis(0.0, 0.0, 1.0);
+	//glm::vec3 x_axis(1.0, 0.0, 0.0);
+	//glm::vec3 y_axis(0.0, 1.0, 0.0);
+	//glm::vec3 z_axis(0.0, 0.0, 1.0);
 
-	glm::vec3 cam_pos(0, 0, 0);
-	glm::vec3 cam_up = y_axis;
-	glm::vec3 cam_right = x_axis;
-	glm::vec3 cam_front = -z_axis; //oikeakatinen koordinaatisto
-	glm::mat4 P = glm::lookAt(cam_pos, cam_pos + cam_front, cam_up);
+	//glm::vec3 cam_pos(0, 0, 0);
+	//glm::vec3 cam_up = y_axis;
+	//glm::vec3 cam_right = x_axis;
+	//glm::vec3 cam_front = -z_axis; //oikeakatinen koordinaatisto
+	//glm::mat4 P = glm::lookAt(cam_pos, cam_pos + cam_front, cam_up);
 
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
 
-	glm::mat4 V = glm::ortho(-1.0f, 1.0f, -1.0f*height / width, 1.0f*height / width);
-	VP = V*P;
-
+	//glm::mat4 V = glm::ortho(-1.0f, 1.0f, -1.0f*height / width, 1.0f*height / width);
+	//VP = V*P;
+	MVP=getMVP();
 	//glUseProgram(programID);
 }
 
@@ -878,4 +886,45 @@ void Renderer::drawPointSprite(float x, float y, float scale, PointSprite p, flo
 	//glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
 	//MVP = MVP_temp;
+}
+
+glm::mat4 Renderer::getMVP()
+{
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
+
+	glm::mat4 projection = glm::ortho(-1.0f, 1.0f, -1.0f*height / width, 1.0f*height / width);
+	glm::mat4 view = glm::lookAt(cam_pos, cam_pos + cam_front, cam_up);
+	glm::mat4 model = glm::mat4(1.0f);
+
+	glm::mat4 mvp = projection * view * model;
+	return mvp;
+}
+
+//kutsutaan aina kun näppäintä painetaan/vapautetaan.
+void Renderer::key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
+{
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	if (key >= 0 && key < 1024)
+	{
+		if (action == GLFW_PRESS)
+			keys[key] = true;
+		else if (action == GLFW_RELEASE)
+			keys[key] = false;
+	}
+}
+
+//Kameran kontrollit
+void Renderer::do_movement()
+{
+	GLfloat cam_speed = 0.01f;
+	if (keys[GLFW_KEY_W])
+		cam_pos += cam_speed * cam_front;
+	if (keys[GLFW_KEY_S])
+		cam_pos -= cam_speed * cam_front;
+	if (keys[GLFW_KEY_A])
+		cam_pos -= glm::normalize(glm::cross(cam_front, cam_up)) * cam_speed;
+	if (keys[GLFW_KEY_D])
+		cam_pos += glm::normalize(glm::cross(cam_front, cam_up)) * cam_speed;
 }
