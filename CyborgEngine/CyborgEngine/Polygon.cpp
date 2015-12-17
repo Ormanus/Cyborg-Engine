@@ -16,7 +16,7 @@ Polygon::~Polygon()
 void Polygon::setPoints(glm::vec2* p, int size)
 {
 	//float maxX = 0, maxY = 0, minX = 0, minY = 0;
-	points = new glm::vec2[size];
+	points = new glm::vec2[size+1];
 	numPoints = 0;
 	points[0] = glm::vec2(0, 0);
 	for (int i = 0; i < size; i++)
