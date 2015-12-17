@@ -6,7 +6,7 @@ Sprite::Sprite()
 {
 	rows = 0;
 	columns = 0;
-	setSprite();
+
 }
 
 

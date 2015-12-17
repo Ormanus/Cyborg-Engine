@@ -18,8 +18,12 @@ public:
 	~Sprite();
 
 
-	void setRows(int c){ rows = c; }
-	void setColumns(int d){ columns = d;}
+	void setUp(int c,int d)
+	{ 
+		rows = c; 
+		columns = d;
+		setSprite();
+	}
 	void setSprite();
 
 	int getRows(){ return rows; }

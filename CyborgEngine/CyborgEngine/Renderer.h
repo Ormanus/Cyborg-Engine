@@ -52,7 +52,7 @@ public:
 
 	void static drawSingleSprite(float posX, float posY, float height, float width,std::string textureName);
 
-	void static drawSprite(float posX, float posY, float height, float width, float spriteWidth , float spriteHeight,std::string textureName);
+	void static drawSprite(Sprite *SP,float posX, float posY, float spriteWidth , float spriteHeight,std::string textureName);
 
 
 	void static drawPointSprite(float x, float y, float scale, PointSprite p);

@@ -104,7 +104,6 @@ void Renderer::initRender(GLFWwindow* w)
 	//glEnable(jotain)
 
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 }
@@ -638,9 +637,6 @@ void Renderer::drawSingleSprite(float posX, float posY, float height, float widt
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_DYNAMIC_DRAW);
 	GLuint vb, ib;
 
-	/*float spriteWidth = SP->getSpriteWidth(rows);
-	float spriteHeight = SP->getSpriteHeight(colums);*/
-
 	//Spriteen neliö:
 	GLfloat g_vertex_buffer_data[] = 
 	{
@@ -701,10 +697,9 @@ void Renderer::drawSingleSprite(float posX, float posY, float height, float widt
 	glDisable(GL_TEXTURE_2D);
 	
 }
-void Renderer::drawSprite(float posX, float posY, float height, float width, float spriteWidth, float spriteHeight, std::string textureName)
+void Renderer::drawSprite(Sprite* SP,float posX, float posY, float spriteWidth, float spriteHeight, std::string textureName)
 {
 	glDisable(GL_MULTISAMPLE);
-	
 	//Tekstuuri temput ---------
 	glEnable(GL_TEXTURE_2D);
 	glUseProgram(textureProgramID);
@@ -714,6 +709,9 @@ void Renderer::drawSprite(float posX, float posY, float height, float width, flo
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glUniform1i(TextureID, 0);
 	
+	float width = SP->getSpriteWidth();
+	float height = SP->getSpriteHeight();
+
 	GLuint uvbuffer;
 	static const GLfloat g_uv_buffer_data[] =
 	{

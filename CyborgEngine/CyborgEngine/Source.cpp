@@ -58,19 +58,11 @@ int main()
 	PointSprite ps(0, 0, "part");
 	
 
-	//Sprite-----------------------:
 	Sprite aa;
-	aa.setRows(6);
-	aa.setColumns(5);
-	
+	aa.setUp(6,5);
 	float aX = aa.getSprite(1).x;
-	float aY = aa.getSprite(0).y;
-	float width = aa.getSpriteWidth();
-	float height = aa.getSpriteHeight();
+	float aY = aa.getSprite(1).y;
 
-	std::cout << "X: " << aX << "Y: " << aY << std::endl;
-	std::cout << "X2: " << width<<", "<< "Y2: " <<height  << std::endl;
-	//--------------------------------
 	Polygon p;
 	
 	glm::vec2 points[]
@@ -125,7 +117,8 @@ int main()
 		{
 			Renderer::drawPointSprite(cos((i*step + a) * 2 + PI / 2), sin(i*step + a), (sin(step*i - a) / 2.2 + 0.51) / 2, ps);
 		}
-		//Renderer::drawSprite(-0.5,0.5,height,width,aX,aY,"sheet");
+		//Renderer::drawSprite(&aa,-0.5,0.5,aX,aY,"sheet");
+		
 		//swap buffers
 		Renderer::render();
 		glfwPollEvents();
