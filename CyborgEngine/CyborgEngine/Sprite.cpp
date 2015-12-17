@@ -35,7 +35,6 @@ glm::vec2 Sprite::getSprite(int a)
 	auto i = coordinates.find(a);
 	if (i == coordinates.end())
 	{
-		std::cout << "Allah" << std::endl;
 		return glm::vec2(0, 0);
 	}
 	else
