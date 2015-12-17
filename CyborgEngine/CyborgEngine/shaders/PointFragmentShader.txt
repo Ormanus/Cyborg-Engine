@@ -1,6 +1,7 @@
 #version 120
 
 uniform sampler2D myTextureSampler;
+uniform float alpha;
 
 void main()
 {
@@ -11,6 +12,7 @@ void main()
 	}
 	else
 	{
+		c.a = alpha;
 		gl_FragColor = c;
 	}
 }

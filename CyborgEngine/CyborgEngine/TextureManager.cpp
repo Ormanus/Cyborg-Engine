@@ -53,7 +53,7 @@ GLuint TextureManager::getTexture(std::string name)
 
 		if (i == textures.end())
 		{
-			std::cout << "Texture: " << name << " does not exist. Replaced with default texture" << std::endl;
+			//std::cout << "Texture: " << name << " does not exist. Replaced with default texture" << std::endl;
 			return getTexture("default");
 		}
 		else

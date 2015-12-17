@@ -7,6 +7,9 @@ namespace {
 	GLuint programID;
 	GLuint textureProgramID;
 	GLuint pointProgramID;
+	GLuint lineProgramID;
+	GLuint point_alpha_ID;
+	GLuint sprite_alpha_ID;
 	//GLuint vertexbuffer;
 	GLuint VertexArrayID;
 	//GLuint indexbuffer;
@@ -24,6 +27,8 @@ namespace {
 	Sprite *SP;
 	GLuint scale_ID;
 	GLuint size_ID;
+	GLuint line_color_ID;
+	//GLuint line_MVP_ID;
 };
 
 void Renderer::FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
@@ -81,6 +86,7 @@ void Renderer::initRender(GLFWwindow* w)
 	programID = LoadShaders("shaders/VertexShader.vertexshader", "shaders/FragmentShader.fragmentshader");
 	textureProgramID = LoadShaders("shaders/TextureVertexShader.txt", "shaders/TextureFragmentShader.txt");
 	pointProgramID = LoadShaders("shaders/PointVertexShader.txt", "shaders/PointFragmentShader.txt");
+	lineProgramID = LoadShaders("shaders/LineVertexShader.txt", "shaders/LineFragmentShader.txt");
 	//----------------
 
 	//luodaan väribufferi. 
@@ -100,6 +106,10 @@ void Renderer::initRender(GLFWwindow* w)
 	MVP_MatrixID = glGetUniformLocation(programID, "MVP");
 	scale_ID = glGetUniformLocation(pointProgramID, "scale");
 	size_ID = glGetUniformLocation(pointProgramID, "point_size");
+	point_alpha_ID = glGetUniformLocation(pointProgramID, "alpha");
+	sprite_alpha_ID = glGetUniformLocation(textureProgramID, "alpha");
+	line_color_ID = glGetUniformLocation(lineProgramID, "color");
+	//line_MVP_ID = glGetUniformLocation(lineProgramID, "MVP");
 
 	//glEnable(jotain)
 
@@ -131,12 +141,12 @@ void Renderer::drawCircle(float x, float y, float r)
 	}
 }
 
-void Renderer::drawPie(float x, float y, float r,float a)
+void Renderer::drawPie(float x, float y, float r, float a, float start)
 {
 	float angle = 2.0*3.14159265 / 64 * a;
 	for (int i = 0; i < 64; i++)
 	{
-		drawTriangle(x, y, x + cos(angle * i)*r, y + sin(angle * i)*r, x + cos(angle * (i + 1))*r, y + sin(angle * (i + 1))*r);
+		drawTriangle(x, y, x + cos(angle * i + start)*r, y + sin(angle * i + start)*r, x + cos(angle * (i + 1) + start)*r, y + sin(angle * (i + 1) + start)*r);
 	}
 }
 
@@ -209,6 +219,7 @@ void Renderer::drawPolygonTextured(Polygon* p, const float x, const float y, std
 	glBindTexture(GL_TEXTURE_2D, texture);
 
 	glUniform1i(TextureID, 0);
+	glUniform1f(sprite_alpha_ID, 1);
 
 	glm::mat4 MVP_temp = MVP;
 	MVP = MVP * glm::translate(glm::vec3(x, y, 0));
@@ -370,7 +381,7 @@ void Renderer::drawTriangle(float x1, float y1, float x2, float y2, float x3, fl
 	glDeleteBuffers(1, &vb);
 	glDeleteBuffers(1, &ib);
 
-	glDisable(GL_BLEND);
+	//glDisable(GL_BLEND);
 }
 
 void Renderer::drawTexturedTriangle(float x1, float y1, float x2, float y2, float x3, float y3, std::string textureName)
@@ -393,6 +404,7 @@ void Renderer::drawTexturedTriangle(float x1, float y1, float x2, float y2, floa
 	glBindTexture(GL_TEXTURE_2D, texture);
 
 	glUniform1i(TextureID, 0);
+	glUniform1f(sprite_alpha_ID, 1);
 
 	GLfloat* g_uv_buffer_data = new GLfloat[6];
 
@@ -475,6 +487,7 @@ void Renderer::drawTexturedRectangle(float x1, float y1, float x2, float y2, std
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glUniform1i(TextureID, 0);
+	glUniform1f(sprite_alpha_ID, 1);
 	//-----------------------------
 
 	GLuint uvbuffer;
@@ -554,7 +567,7 @@ void Renderer::drawTexturedRectangle(float x1, float y1, float x2, float y2, std
 void Renderer::drawLine(float startPointX, float startPointY, float endPointX, float endPointY, float width)
 {
 
-	glUseProgram(programID);
+	glUseProgram(lineProgramID);
 
 	GLuint bv, bi;
 
@@ -577,7 +590,8 @@ void Renderer::drawLine(float startPointX, float startPointY, float endPointX, f
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bi);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(g_indices), g_indices, GL_DYNAMIC_DRAW);
 
-	glUniformMatrix4fv(MVP_MatrixID, 1, GL_FALSE, &MVP[0][0]);
+	//glUniformMatrix4fv(MVP_MatrixID, 1, GL_FALSE, &MVP[0][0]);
+	glUniform4f(line_color_ID, DefaultColor.r, DefaultColor.g, DefaultColor.b, DefaultColor.a);
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bi);
@@ -623,6 +637,7 @@ void Renderer::drawSingleSprite(float posX, float posY, float height, float widt
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glUniform1i(TextureID, 0);
+	glUniform1f(sprite_alpha_ID, 1);
 	GLuint uvbuffer;
 	static const GLfloat g_uv_buffer_data[] =
 	{
@@ -697,9 +712,10 @@ void Renderer::drawSingleSprite(float posX, float posY, float height, float widt
 	glDisable(GL_TEXTURE_2D);
 	
 }
-void Renderer::drawSprite(Sprite* SP,float posX, float posY, float spriteWidth, float spriteHeight, std::string textureName)
+void Renderer::drawSprite(Sprite* SP,float posX, float posY, float spriteWidth, float spriteHeight, std::string textureName, float alpha)
 {
 	glDisable(GL_MULTISAMPLE);
+	//glDisable(GL_MULTISAMPLE_ARB);
 	//Tekstuuri temput ---------
 	glEnable(GL_TEXTURE_2D);
 	glUseProgram(textureProgramID);
@@ -708,12 +724,13 @@ void Renderer::drawSprite(Sprite* SP,float posX, float posY, float spriteWidth, 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glUniform1i(TextureID, 0);
+	glUniform1f(sprite_alpha_ID, alpha);
 	
 	float width = SP->getSpriteWidth();
 	float height = SP->getSpriteHeight();
 
 	GLuint uvbuffer;
-	static const GLfloat g_uv_buffer_data[] =
+	GLfloat g_uv_buffer_data[] =
 	{
 		spriteWidth,spriteHeight,
 		spriteWidth,spriteHeight+height,
@@ -729,7 +746,7 @@ void Renderer::drawSprite(Sprite* SP,float posX, float posY, float spriteWidth, 
 	/*float spriteWidth = SP->getSpriteWidth(rows);
 	float spriteHeight = SP->getSpriteHeight(colums);*/
 
-	//Spriteen neliö:
+	//Spriten neliö:
 	GLfloat g_vertex_buffer_data[] =
 	{
 		posX, posY, 1.0f,
@@ -805,13 +822,14 @@ void Renderer::setColor(float r, float g, float b, float a)
 
 void Renderer::setColor(int color)
 {
-	float r = (float)((color >> 16) & 0xFF) / 255;
-	float g = (float)((color >> 8) & 0xFF) / 255;
-	float b = (float)((color >> 0) & 0xFF) / 255;
-	setColor(r, g, b, 1);
+	float r = (float)((color >> 24) & 0xFF) / 255;
+	float g = (float)((color >> 16) & 0xFF) / 255;
+	float b = (float)((color >> 8) & 0xFF) / 255;
+	float a = (float)((color >> 0) & 0xFF) / 255;
+	setColor(r, g, b, a);
 }
 
-void Renderer::drawPointSprite(float x, float y, float scale, PointSprite p)
+void Renderer::drawPointSprite(float x, float y, float scale, PointSprite p, float alpha)
 {
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
@@ -840,6 +858,7 @@ void Renderer::drawPointSprite(float x, float y, float scale, PointSprite p)
 
 	glUniform1f(scale_ID, scale);
 	glUniform1f(size_ID, 256);
+	glUniform1f(point_alpha_ID, alpha);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(
@@ -856,7 +875,7 @@ void Renderer::drawPointSprite(float x, float y, float scale, PointSprite p)
 	glDisableVertexAttribArray(0);
 	glDeleteBuffers(1, &vb);
 	glDisable(GL_POINT_SPRITE);
-	glDisable(GL_BLEND);
+	//glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
 	//MVP = MVP_temp;
 }
