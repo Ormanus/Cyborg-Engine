@@ -98,6 +98,7 @@ int main()
 			{
 				isEnterPressed = true;
 				scene = (scene+1) % 3;
+				a = 0.0f;
 			}
 		}
 		else
@@ -185,7 +186,7 @@ int main()
 				float aX = aa.getSprite(spriteNumber % 30).x;
 				float aY = aa.getSprite(spriteNumber % 30).y;
 				Renderer::drawSprite(&aa, rain[i].x, rain[i].y, aX, aY, "sheet", 1);
-				rain[i].y -= 0.03 + sin(rain[i].x * a * 4) / 120;
+				rain[i].y -= 0.03 + sin(rain[i].x * cos(a) * 4) / 120;
 				if (rain[i].y < -1.0)
 				{
 					rain[i].y = 1.2;
