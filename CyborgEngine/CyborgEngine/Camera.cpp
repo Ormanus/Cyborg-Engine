@@ -1,99 +1,78 @@
-/*#include <cstdio>
-#include <cstdlib>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/transform.hpp>
-#include "Camera.hpp"
-GLFWwindow* window;
-using namespace glm;
+#include "Renderer.h"
+#include "Camera.h"
 
-glm::mat4 ViewMatrix;
-glm::mat4 ProjectionMatrix;
+static GLFWwindow* window = nullptr;
 
-glm::mat4 getViewMatrix(){
-	return ViewMatrix;
+namespace
+{
+
+	glm::mat4 VP;
+};
+
+glm::vec3 x_axis(1.0, 0.0, 0.0);
+glm::vec3 y_axis(0.0, 1.0, 0.0);
+glm::vec3 z_axis(0.0, 0.0, 1.0);
+glm::vec3 cam_pos(0, 0, 0);
+glm::vec3 cam_up = y_axis;
+glm::vec3 cam_right = x_axis;
+glm::vec3 cam_front = -z_axis; //oikeakatinen koordinaatisto
+bool keys[1024];
+
+void Camera::FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
+	float scale = width / height;
+	glViewport(0, 0, width / scale, height);
 }
-glm::mat4 getProjectionMatrix(){
-	return ProjectionMatrix;
+
+
+void Camera::Draw()
+{
+
+	//int width, height;
+	//glfwGetFramebufferSize(window, &width, &height);
+	//glm::mat4 V = glm::ortho(-1.0f, 1.0f, -1.0f*height / width, 1.0f*height / width);
+	//glm::mat4 P = glm::lookAt(cam_pos, cam_pos + cam_front, cam_up);
+	//VP = V*P;
+	//glm::mat4 view;
+	//view = glm::lookAt(cam_pos, cam_pos + cam_front, cam_up);
 }
 
+glm::mat4 Camera::getMVP()
+{
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
 
-// Initial position : on +Z
-glm::vec3 position = glm::vec3(0, 0, 5);
-// Initial horizontal angle : toward -Z
-float horizontalAngle = 3.14f;
-// Initial vertical angle : none
-float verticalAngle = 0.0f;
-float initialFoV = 45.0f;
-float speed = 3.0f;
-float mouseSpeed = 0.005f;
+	glm::mat4 projection = glm::ortho(-1.0f, 1.0f, -1.0f*height / width, 1.0f*height / width);
+	glm::mat4 view = glm::lookAt(cam_pos, cam_pos + cam_front, cam_up);
+	glm::mat4 model = glm::mat4(1.0f);
 
+	glm::mat4 mvp = projection * view * model;
+	return mvp;
+}
 
-
-void computeMatrices(){
-
-	static double lastTime = glfwGetTime();
-
-	// Compute time difference between current and last frame
-	double currentTime = glfwGetTime();
-	float deltaTime = float(currentTime - lastTime);
-
-	// Get mouse position
-	double xpos, ypos;
-	glfwGetCursorPos(window, &xpos, &ypos);
-
-	// Reset mouse position for next frame
-	glfwSetCursorPos(window, 1024 / 2, 768 / 2);
-
-	// Compute new orientation
-	horizontalAngle += mouseSpeed * float(1024 / 2 - xpos);
-	verticalAngle += mouseSpeed * float(768 / 2 - ypos);
-
-	// Direction : Spherical coordinates to Cartesian coordinates conversion
-	glm::vec3 direction(
-		cos(verticalAngle) * sin(horizontalAngle),
-		sin(verticalAngle),
-		cos(verticalAngle) * cos(horizontalAngle)
-		);
-
-	// Right vector
-	glm::vec3 right = glm::vec3(
-		sin(horizontalAngle - 3.14f / 2.0f),
-		0,
-		cos(horizontalAngle - 3.14f / 2.0f)
-		);
-
-	// Up vector
-	glm::vec3 up = glm::cross(right, direction);
-
-	// Move forward
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
-		position += direction * deltaTime * speed;
+//kutsutaan aina kun näppäintä painetaan/vapautetaan.
+void Camera::key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
+{
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	if (key >= 0 && key < 1024)
+	{
+		if (action == GLFW_PRESS)
+			keys[key] = true;
+		else if (action == GLFW_RELEASE)
+			keys[key] = false;
 	}
-	// Move backward
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
-		position -= direction * deltaTime * speed;
-	}
-	// Strafe right
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
-		position += right * deltaTime * speed;
-	}
-	// Strafe left
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
-		position -= right * deltaTime * speed;
-	}
+}
 
-	float FoV = initialFoV;
-
-	// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-	ProjectionMatrix = glm::perspective(FoV, 4.0f / 3.0f, 0.1f, 100.0f);
-	// Camera matrix
-	ViewMatrix = glm::lookAt(
-		position,          
-		position + direction,
-		up               
-		);
-	lastTime = currentTime;
-}*/
+//Kameran kontrollit
+void Camera::do_movement()
+{
+	GLfloat cam_speed = 0.1f;
+	if (keys[GLFW_KEY_W])
+		cam_pos += cam_speed * cam_front;
+	if (keys[GLFW_KEY_S])
+		cam_pos -= cam_speed * cam_front;
+	if (keys[GLFW_KEY_A])
+		cam_pos -= glm::normalize(glm::cross(cam_front, cam_up)) * cam_speed;
+	if (keys[GLFW_KEY_D])
+		cam_pos += glm::normalize(glm::cross(cam_front, cam_up)) * cam_speed;
+}
